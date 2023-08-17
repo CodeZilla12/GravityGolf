@@ -5,13 +5,13 @@ class PointMass:
     
     number_of_points = 0
 
-    def __init__(self, velocity, position, mass, radius, colour):
+    def __init__(self, velocities, positions, mass, radius = 10, colour = (255,255,255) ):
          
         self.id = PointMass.number_of_points
         PointMass.number_of_points += 1
         
-        self.velocity = velocity
-        self.position = position
+        self.velocities = np.asarray(velocities, dtype = np.float64) 
+        self.positions = np.asarray(positions, dtype = np.int32)
         self.mass = mass
         self.radius = radius 
         self.colour = colour
@@ -23,9 +23,9 @@ class Window:
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 400
         
-        self.object_list = [[0,np.asarray([50,0],dtype = np.float64),np.asarray([200,300]), 10e10],
-                            [1,np.asarray([0,0],dtype = np.float64),np.asarray([400,200]), 10e10]
-        ] #sublists give id int,velocity(vx,vy) numpy, position(x,y) numpy, mass(m) numlike
+        self.object_list = [PointMass([0,0],[200,300], 10e10),
+                            PointMass([0,0],[500,300], 10e10)
+        ]
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
@@ -46,10 +46,10 @@ class Window:
                 if event.type == pygame.QUIT:
                     running = False
             
-            for i,object in enumerate(self.object_list):
-                position = [object[2][0], self.WINDOW_HEIGHT - object[2][1]] #refactor this
+            for object in self.object_list:
+                flipped_y_position = [object.positions[0], self.WINDOW_HEIGHT - object.positions[1]] #refactor this
                 
-                pygame.draw.circle(self.SCREEN, np.asarray([255,255,255])/(i+1), position, 10 )
+                pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
             
             
             for object in self.object_list:
@@ -64,15 +64,12 @@ class Window:
     
     
     def update_position(self,object):
-        id, velocities, positions, _mass = object #refactor as dictionary or dataclass
+    
+        object.positions = object.positions + (object.velocities * self.DELTA_T)
         
-        positions = positions + velocities * self.DELTA_T
-        
-        self.object_list[id] = [id, velocities, positions, _mass]
     
     def update_velocity(self,object):
-        id, velocities, positions, _mass = object
-        
+
         """
         ΔVx = GMcos(θ)/(r*t)
         ΔVy = GMsin(θ)/(r*t)
@@ -82,28 +79,21 @@ class Window:
         delta_t = 1/self.FPS #change to real delta_t
         
         for other_object in self.object_list:
-            other_id,_,other_positions,other_mass = other_object
-            if other_id == id:
+            if other_object.id == object.id:
                 continue
                 
-            dx,dy = other_positions - positions
+            dx,dy = other_object.positions - object.positions
             
             #angle = np.arctan(dx/dy)
             angle = np.arctan2(dy,dx) #electric boogaloo how function
             separation = np.hypot(dx,dy)
             
             delta_velocities += np.asarray([
-                self.G * other_mass * np.cos(angle) / (separation * self.DELTA_T),
-                self.G * other_mass * np.sin(angle) / (separation * self.DELTA_T)
+                self.G * other_object.mass * np.cos(angle) / (separation * self.DELTA_T),
+                self.G * other_object.mass * np.sin(angle) / (separation * self.DELTA_T)
             ], dtype = np.float64) #[delta_vx, delta_vy]
-
-        #velocities += np.asarray([10,10])
-        #self.object_list[id] = [id,velocities,positions,_mass]
-        #return
         
-        velocities += delta_velocities
-        
-        self.object_list[id] = [id,velocities,positions,_mass]
+        object.velocities += delta_velocities
     
 
 if __name__ == '__main__':
