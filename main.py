@@ -1,13 +1,29 @@
 import pygame
 import numpy as np
 
+class PointMass:
+    
+    number_of_points = 0
+
+    def __init__(self, velocity, position, mass, radius, colour):
+         
+        self.id = PointMass.number_of_points
+        PointMass.number_of_points += 1
+        
+        self.velocity = velocity
+        self.position = position
+        self.mass = mass
+        self.radius = radius 
+        self.colour = colour
+        
+
 class Window:
     def __init__(self):
         
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 400
         
-        self.object_list = [[0,np.asarray([50,0],dtype = np.float64),np.asarray([200,300]), 10],
+        self.object_list = [[0,np.asarray([50,0],dtype = np.float64),np.asarray([200,300]), 10e10],
                             [1,np.asarray([0,0],dtype = np.float64),np.asarray([400,200]), 10e10]
         ] #sublists give id int,velocity(vx,vy) numpy, position(x,y) numpy, mass(m) numlike
         
@@ -44,6 +60,8 @@ class Window:
             pygame.display.flip()
             
             self.CLOCK.tick(30)
+            
+    
     
     def update_position(self,object):
         id, velocities, positions, _mass = object #refactor as dictionary or dataclass
