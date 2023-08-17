@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import random
 
 class PointMass:
     
@@ -21,11 +22,21 @@ class Window:
     def __init__(self):
         
         self.WINDOW_WIDTH = 800
-        self.WINDOW_HEIGHT = 400
+        self.WINDOW_HEIGHT = 800
         
-        self.object_list = [PointMass([0,0],[200,300], 10e10),
-                            PointMass([0,0],[500,300], 10e10)
+        #could move this into the PointMass class
+        
+        """
+        self.object_list = [PointMass([0,0],[200,300], 10),
+                            PointMass([0,0],[500,300], 10),
+                            PointMass([0,0],[600,300], 10e10),
+                            PointMass([0,0],[200,400], 10),
+                            PointMass([0,0],[600,400], 10)            
         ]
+        """
+        
+        self.object_list = [self.generate_pointmass() for _ in range(100)]
+        
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
@@ -34,6 +45,22 @@ class Window:
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
         
         self.G = 6.67e-11    
+    
+    def generate_pointmass(self, velocities = None, mass = None):
+        x = random.randint(0,self.WINDOW_WIDTH)
+        y = random.randint(0,self.WINDOW_HEIGHT)
+        
+        if velocities is None:
+            vx = random.randint(0,100)
+            vy = random.randint(0,100)
+        
+        if mass is None:
+            mass = random.randint(1e5,1e10)
+        
+        color = tuple(random.randint(0,255) for _ in range(3))
+        
+        return PointMass([vx,vy],[x,y], mass, colour = color)
+        
         
     def main_loop(self):
         
