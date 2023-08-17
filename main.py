@@ -35,7 +35,7 @@ class Window:
         ]
         """
         
-        self.object_list = [self.generate_pointmass() for _ in range(100)]
+        self.object_list = [self.generate_pointmass(velocities = [0,0]) for _ in range(50)]
         
         
         pygame.init()
@@ -51,11 +51,14 @@ class Window:
         y = random.randint(0,self.WINDOW_HEIGHT)
         
         if velocities is None:
-            vx = random.randint(0,100)
-            vy = random.randint(0,100)
+            vx = random.randint(-100,100)
+            vy = random.randint(-100,100)
+            
+        if velocities:
+            vx,vy = velocities
         
         if mass is None:
-            mass = random.randint(1e5,1e10)
+            mass = random.randint(1e10,1e10)
         
         color = tuple(random.randint(0,255) for _ in range(3))
         
