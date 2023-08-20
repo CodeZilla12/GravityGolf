@@ -35,7 +35,7 @@ class Window:
         ]
         """
         
-        self.object_list = [self.generate_pointmass(velocities = [0,0]) for _ in range(50)]
+        self.object_list = [self.generate_pointmass() for _ in range(100)]
         
         
         pygame.init()
@@ -51,14 +51,14 @@ class Window:
         y = random.randint(0,self.WINDOW_HEIGHT)
         
         if velocities is None:
-            vx = random.randint(-100,100)
-            vy = random.randint(-100,100)
+            vx = random.randint(-10,10)
+            vy = random.randint(-10,10)
             
         if velocities:
             vx,vy = velocities
         
         if mass is None:
-            mass = random.randint(1e10,1e10)
+            mass = random.randint(10,1e10)
         
         color = tuple(random.randint(0,255) for _ in range(3))
         
@@ -76,13 +76,12 @@ class Window:
                 if event.type == pygame.QUIT:
                     running = False
             
+            
             for object in self.object_list:
-                flipped_y_position = [object.positions[0], self.WINDOW_HEIGHT - object.positions[1]] #refactor this
                 
+                flipped_y_position = [object.positions[0], self.WINDOW_HEIGHT - object.positions[1]] #refactor this
                 pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
             
-            
-            for object in self.object_list:
                 self.update_velocity(object)
                 self.update_position(object)
             
@@ -92,12 +91,11 @@ class Window:
             self.CLOCK.tick(30)
             
     
-    
     def update_position(self,object):
     
         object.positions = object.positions + (object.velocities * self.DELTA_T)
         
-    
+        
     def update_velocity(self,object):
 
         """
