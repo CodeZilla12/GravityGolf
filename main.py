@@ -19,7 +19,7 @@ class PointMass:
         
 
 class Window:
-    def __init__(self):
+    def __init__(self, point_mass_list = None):
         
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 800
@@ -35,8 +35,10 @@ class Window:
         ]
         """
         
-        self.object_list = [self.generate_pointmass() for _ in range(50)]
-        
+        if not point_mass_list:
+            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(50)] #generate range(N) random pointmasses
+        else:
+            self.object_list = point_mass_list
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
