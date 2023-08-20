@@ -24,37 +24,28 @@ class Window:
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 800
         
-        #could move this into the PointMass class
-        
-        """
-        self.object_list = [PointMass([0,0],[200,300], 10),
-                            PointMass([0,0],[500,300], 10),
-                            PointMass([0,0],[600,300], 10e10),
-                            PointMass([0,0],[200,400], 10),
-                            PointMass([0,0],[600,400], 10)            
-        ]
-        """
-        
         if not point_mass_list:
-            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(50)] #generate range(N) random pointmasses
+            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(30)] #generate range(N) random pointmasses
         else:
             self.object_list = point_mass_list
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 60
+        self.FPS = 30
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
+        self.LOSS_ON_COLLISION = 0.95 #multiplicative
+        self.COLLISION_ON = True
         
-        self.G = 6.67e-11    
+        self.G = 6.67e-11    #gravitational constant
     
     def generate_pointmass(self, velocities = None, mass = None):
         x = random.randint(0,self.WINDOW_WIDTH)
         y = random.randint(0,self.WINDOW_HEIGHT)
         
         if velocities is None:
-            vx = random.randint(-10,10)
-            vy = random.randint(-10,10)
+            vx = random.randint(-100,100)
+            vy = random.randint(-100,100)
             
         if velocities:
             vx,vy = velocities
@@ -66,6 +57,12 @@ class Window:
         
         return PointMass([vx,vy],[x,y], mass, colour = color)
         
+    @staticmethod
+    def points_colliding(point_a, point_b):
+        
+        return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
+        
+        #(R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
         
     def main_loop(self):
         
@@ -108,7 +105,12 @@ class Window:
         for other_object in self.object_list:
             if other_object.id == object.id: #do not compute force of object on itself
                 continue
-                
+            
+            if self.COLLISION_ON:
+                if self.points_colliding(object,other_object):
+                    object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
+                    return
+            
             dx,dy = other_object.positions - object.positions
             
             angle = np.arctan2(dy,dx) #quadrant-based arctan. Corrects for discrepancies based on sign flipping 
@@ -123,4 +125,20 @@ class Window:
     
 
 if __name__ == '__main__':
-    Window().main_loop()
+    
+    """
+    point_list = [PointMass([0,0],[200,300], 10),
+                            PointMass([0,0],[500,300], 10),
+                            PointMass([0,0],[600,300], 10e10),
+                            PointMass([0,0],[200,400], 10),
+                            PointMass([0,0],[600,400], 10)            
+        ]
+    """
+    
+    #point_list = [PointMass([50,0],[200,300],10),PointMass([0,0],[400,300],10)] #Collision test
+
+
+    #point_list = [PointMass([50,0],[100,100],10e10),PointMass([0,0],[400,400],10e11,colour = (255,0,0))]
+    point_list = None
+
+    Window(point_list).main_loop()
