@@ -20,23 +20,22 @@ class PointMass:
         
 
 class Window:
-    def __init__(self, point_mass_list = None):
+    def __init__(self,screen_size = (800,800), point_mass_list = None):
         
-        self.WINDOW_WIDTH = 800
-        self.WINDOW_HEIGHT = 800
+        self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 60
+        self.FPS = 40
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
-        self.LOSS_ON_COLLISION = 0.5 #multiplicative
+        self.LOSS_ON_COLLISION = 0.7 #multiplicative
         self.COLLISION_ON = True
         
         self.G = 6.67e-11    #gravitational constant
         
         ONE_AU = 1.5e11
-        PIXELS_PER_AU = 300
+        PIXELS_PER_AU = 200
         
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
         
@@ -46,7 +45,7 @@ class Window:
         self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
         
         if not point_mass_list:
-            self.object_list = [self.generate_pointmass() for _ in range(2)] #generate range(N) random pointmasses
+            self.object_list = [self.generate_pointmass() for _ in range(50)] #generate range(N) random pointmasses
         else:
             self.object_list = point_mass_list
         
@@ -141,7 +140,7 @@ class Window:
                     object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     
-                    return
+                    continue
             
             dx,dy = other_object.positions - object.positions
             
@@ -158,7 +157,16 @@ class Window:
 
 if __name__ == '__main__':
     
+    AU = 1.5e11
+    screen_size = (800,800)
+    #Solar system test. Does not work unless 1e6x actual velocities. Likely to do with the fps.
+    point_list = [
+    
+    PointMass([30e10,-30e10],[2*AU, 3.5*AU], 6e24),
+    PointMass([0,0],[2*AU,2*AU], 2e30, colour = (255,0,0)),
+    PointMass([-30e10,+30e10],[2*AU, 1*AU], 6e24)
+    ]
     
     point_list = None
 
-    Window(point_list).main_loop()
+    Window(screen_size, point_list).main_loop()
