@@ -110,7 +110,13 @@ class Window:
                 pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION )
             
                 self.update_velocity(object)
-                self.update_position(object) #Updating position here will cause inaccuraccy at small separation / high mass. Ideally in its own loop?
+                
+                self.update_position(object)
+            
+            
+            #do this instead for more precise results
+            #for object in self.object_list:
+            #    self.update_position(object) 
             
             
             pygame.display.flip()
@@ -138,14 +144,16 @@ class Window:
             if self.COLLISION_ON:
                 if self.points_colliding(object,other_object):
                     
-                    repulsion = (9*other_object.mass*1e-19) #coulomb repulsion term. Only occurs on contact.
+                    repulsion = (9*other_object.mass*1e-19) #coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
                     
                     object.velocities += - np.sign(object.velocities) * repulsion
                     other_object.velocities += - np.sign(other_object.velocities) * repulsion
+                    
+                    #old collision detection
                     #object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     #other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     
-                    continue
+                    continue #needed so masses don't slowly sink into each other's center
             
             dx,dy = other_object.positions - object.positions
             
