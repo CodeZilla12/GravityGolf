@@ -12,7 +12,7 @@ class PointMass:
         PointMass.number_of_points += 1
         
         self.velocities = np.asarray(velocities, dtype = np.float64) 
-        self.positions = np.asarray(positions, dtype = np.int32)
+        self.positions = np.asarray(positions, dtype = np.float64)
         self.mass = mass
         self.radius = radius 
         self.colour = colour
@@ -38,6 +38,15 @@ class Window:
         self.COLLISION_ON = True
         
         self.G = 6.67e-11    #gravitational constant
+        
+        ONE_AU = 1.5e11
+        PIXELS_PER_AU = 200
+        
+        self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
+        
+        for object in self.object_list: #temp fix. change unit tests
+            object.positions /= self.AU_PIXELS_CONVERSION
+        
     
     def generate_pointmass(self, velocities = None, mass = None):
         x = random.randint(0,self.WINDOW_WIDTH)
@@ -78,7 +87,10 @@ class Window:
             
             for object in self.object_list:
                 
-                flipped_y_position = [object.positions[0], self.WINDOW_HEIGHT - object.positions[1]] #refactor this
+                flipped_y_position = np.asarray( [object.positions[0] * self.AU_PIXELS_CONVERSION, self.WINDOW_HEIGHT - object.positions[1] * self.AU_PIXELS_CONVERSION] ) #refactor this
+                
+                print(flipped_y_position)
+                
                 pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
             
                 self.update_velocity(object)
@@ -139,6 +151,7 @@ if __name__ == '__main__':
 
 
     #point_list = [PointMass([50,0],[100,100],10e10),PointMass([0,0],[400,400],10e11,colour = (255,0,0))]
+    
     point_list = None
 
     Window(point_list).main_loop()
