@@ -16,6 +16,7 @@ class PointMass:
         self.mass = mass
         self.radius = radius 
         self.colour = colour
+
         
 
 class Window:
@@ -25,7 +26,7 @@ class Window:
         self.WINDOW_HEIGHT = 800
         
         if not point_mass_list:
-            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(10)] #generate range(N) random pointmasses
+            self.object_list = [self.generate_pointmass() for _ in range(10)] #generate range(N) random pointmasses
         else:
             self.object_list = point_mass_list
         
@@ -46,6 +47,8 @@ class Window:
         
         for object in self.object_list: #temp fix. change unit tests
             object.positions /= self.AU_PIXELS_CONVERSION
+            
+        self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
         
     
     def generate_pointmass(self, velocities = None, mass = None):
@@ -60,7 +63,7 @@ class Window:
             vx,vy = velocities
         
         if mass is None:
-            mass = random.randint(10,1e10)
+            mass = random.randint(10e10,10e27)
         
         color = tuple(random.randint(0,255) for _ in range(3))
         
@@ -72,13 +75,28 @@ class Window:
         return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
         
         #(R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
+    
+    def draw_scale_bar(self):
+    
+        x1 = 50
+        x2 = x1 + (1.5e11 * self.AU_PIXELS_CONVERSION)
+    
+        y = 50
+        half_arm_width = 25
         
+        pygame.draw.line(self.SCREEN, (255,255,255), (x1,self.WINDOW_HEIGHT-y), (x2 ,self.WINDOW_HEIGHT-y) )
+        pygame.draw.line(self.SCREEN, (255,255,255), (x1,self.WINDOW_HEIGHT-y-half_arm_width), (x1 ,self.WINDOW_HEIGHT-y+half_arm_width) )
+        pygame.draw.line(self.SCREEN, (255,255,255), (x2,self.WINDOW_HEIGHT-y-half_arm_width), (x2 ,self.WINDOW_HEIGHT-y+half_arm_width) )
+        self.SCALE_BAR_FONT.render_to(self.SCREEN, ((x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
+    
     def main_loop(self):
         
         running = True
         
         while running:
             self.SCREEN.fill((0,0,0))
+            
+            self.draw_scale_bar()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
