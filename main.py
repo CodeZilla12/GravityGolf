@@ -26,22 +26,22 @@ class Window:
         self.WINDOW_HEIGHT = 800
         
         if not point_mass_list:
-            self.object_list = [self.generate_pointmass() for _ in range(10)] #generate range(N) random pointmasses
+            self.object_list = [self.generate_pointmass() for _ in range(2)] #generate range(N) random pointmasses
         else:
             self.object_list = point_mass_list
         
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 30
+        self.FPS = 60
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
-        self.LOSS_ON_COLLISION = 0.95 #multiplicative
+        self.LOSS_ON_COLLISION = 0.4 #multiplicative
         self.COLLISION_ON = True
         
         self.G = 6.67e-11    #gravitational constant
         
         ONE_AU = 1.5e11
-        PIXELS_PER_AU = 200
+        PIXELS_PER_AU = 50
         
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
         
@@ -106,8 +106,6 @@ class Window:
             for object in self.object_list:
                 
                 flipped_y_position = np.asarray( [object.positions[0] * self.AU_PIXELS_CONVERSION, self.WINDOW_HEIGHT - object.positions[1] * self.AU_PIXELS_CONVERSION] ) #refactor this
-                
-                print(flipped_y_position)
                 
                 pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
             
