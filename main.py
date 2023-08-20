@@ -27,9 +27,10 @@ class Window:
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 40
+        self.FPS = 60
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
-        self.LOSS_ON_COLLISION = 0.7 #multiplicative
+        
+        #self.LOSS_ON_COLLISION = 0.7 #multiplicative
         self.COLLISION_ON = True
         
         self.G = 6.67e-11    #gravitational constant
@@ -136,9 +137,13 @@ class Window:
 
             if self.COLLISION_ON:
                 if self.points_colliding(object,other_object):
-
-                    object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
-                    other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
+                    
+                    repulsion = (9*other_object.mass*1e-19) #coulomb repulsion term. Only occurs on contact.
+                    
+                    object.velocities += - np.sign(object.velocities) * repulsion
+                    other_object.velocities += - np.sign(other_object.velocities) * repulsion
+                    #object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
+                    #other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     
                     continue
             
