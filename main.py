@@ -105,26 +105,21 @@ class Window:
         ΔVy = GMsin(θ)/(r*t)
         """
         
-        #delta_velocities = np.asarray([0,0], dtype = np.float64)
-        
-        delta_t = 1/self.FPS #change to real delta_t
-        
         for other_object in self.object_list:
-            if other_object.id == object.id:
+            if other_object.id == object.id: #do not compute force of object on itself
                 continue
                 
             dx,dy = other_object.positions - object.positions
             
-            #angle = np.arctan(dx/dy)
-            angle = np.arctan2(dy,dx) #electric boogaloo how function
+            angle = np.arctan2(dy,dx) #quadrant-based arctan. Corrects for discrepancies based on sign flipping 
+            
             separation = np.hypot(dx,dy)
             
             object.velocities += np.asarray([
                 self.G * other_object.mass * np.cos(angle) / (separation * self.DELTA_T),
                 self.G * other_object.mass * np.sin(angle) / (separation * self.DELTA_T)
             ], dtype = np.float64) #[delta_vx, delta_vy]
-        
-        #object.velocities += delta_velocities
+
     
 
 if __name__ == '__main__':
