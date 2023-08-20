@@ -25,11 +25,6 @@ class Window:
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 800
         
-        if not point_mass_list:
-            self.object_list = [self.generate_pointmass() for _ in range(2)] #generate range(N) random pointmasses
-        else:
-            self.object_list = point_mass_list
-        
         pygame.init()
         self.SCREEN = pygame.display.set_mode([self.WINDOW_WIDTH,self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
@@ -45,19 +40,24 @@ class Window:
         
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
         
-        for object in self.object_list: #temp fix. change unit tests
-            object.positions /= self.AU_PIXELS_CONVERSION
+        #for object in self.object_list: #temp fix. change unit tests
+        #    object.positions /= self.AU_PIXELS_CONVERSION
             
         self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
         
+        if not point_mass_list:
+            self.object_list = [self.generate_pointmass() for _ in range(2)] #generate range(N) random pointmasses
+        else:
+            self.object_list = point_mass_list
+        
     
     def generate_pointmass(self, velocities = None, mass = None):
-        x = random.randint(0,self.WINDOW_WIDTH)
-        y = random.randint(0,self.WINDOW_HEIGHT)
+        x = random.randint(0,self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION)
+        y = random.randint(0,self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)
         
         if velocities is None:
-            vx = random.randint(-100,100)
-            vy = random.randint(-100,100)
+            vx = random.randint(-1e5,+1e5)
+            vy = random.randint(-1e5,+1e5)
             
         if velocities:
             vx,vy = velocities
@@ -158,19 +158,6 @@ class Window:
 
 if __name__ == '__main__':
     
-    """
-    point_list = [PointMass([0,0],[200,300], 10),
-                            PointMass([0,0],[500,300], 10),
-                            PointMass([0,0],[600,300], 10e10),
-                            PointMass([0,0],[200,400], 10),
-                            PointMass([0,0],[600,400], 10)            
-        ]
-    """
-    
-    #point_list = [PointMass([50,0],[200,300],10),PointMass([0,0],[400,300],10)] #Collision test
-
-
-    #point_list = [PointMass([50,0],[100,100],10e10),PointMass([0,0],[400,400],10e11,colour = (255,0,0))]
     
     point_list = None
 
