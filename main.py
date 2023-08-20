@@ -35,7 +35,7 @@ class Window:
         ]
         """
         
-        self.object_list = [self.generate_pointmass() for _ in range(100)]
+        self.object_list = [self.generate_pointmass() for _ in range(50)]
         
         
         pygame.init()
@@ -83,7 +83,7 @@ class Window:
                 pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
             
                 self.update_velocity(object)
-                self.update_position(object)
+                self.update_position(object) #Updating position here will cause inaccuraccy at small separation / high mass. Ideally in its own loop?
             
             
             pygame.display.flip()
@@ -103,7 +103,8 @@ class Window:
         ΔVy = GMsin(θ)/(r*t)
         """
         
-        delta_velocities = np.asarray([0,0], dtype = np.float64)
+        #delta_velocities = np.asarray([0,0], dtype = np.float64)
+        
         delta_t = 1/self.FPS #change to real delta_t
         
         for other_object in self.object_list:
@@ -116,12 +117,12 @@ class Window:
             angle = np.arctan2(dy,dx) #electric boogaloo how function
             separation = np.hypot(dx,dy)
             
-            delta_velocities += np.asarray([
+            object.velocities += np.asarray([
                 self.G * other_object.mass * np.cos(angle) / (separation * self.DELTA_T),
                 self.G * other_object.mass * np.sin(angle) / (separation * self.DELTA_T)
             ], dtype = np.float64) #[delta_vx, delta_vy]
         
-        object.velocities += delta_velocities
+        #object.velocities += delta_velocities
     
 
 if __name__ == '__main__':
