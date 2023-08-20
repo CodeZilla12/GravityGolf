@@ -25,7 +25,7 @@ class Window:
         self.WINDOW_HEIGHT = 800
         
         if not point_mass_list:
-            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(30)] #generate range(N) random pointmasses
+            self.object_list = [self.generate_pointmass([0,0],10e10) for _ in range(10)] #generate range(N) random pointmasses
         else:
             self.object_list = point_mass_list
         
