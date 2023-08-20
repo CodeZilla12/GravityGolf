@@ -6,7 +6,7 @@ class PointMass:
     
     number_of_points = 0
 
-    def __init__(self, velocities, positions, mass, radius = 10, colour = (255,255,255) ):
+    def __init__(self, velocities, positions, mass, radius = 7e9, colour = (255,255,255) ):
          
         self.id = PointMass.number_of_points
         PointMass.number_of_points += 1
@@ -35,13 +35,13 @@ class Window:
         self.CLOCK = pygame.time.Clock()
         self.FPS = 60
         self.DELTA_T = 1/self.FPS #change this to scale off of frame-time
-        self.LOSS_ON_COLLISION = 0.4 #multiplicative
+        self.LOSS_ON_COLLISION = 0.5 #multiplicative
         self.COLLISION_ON = True
         
         self.G = 6.67e-11    #gravitational constant
         
         ONE_AU = 1.5e11
-        PIXELS_PER_AU = 50
+        PIXELS_PER_AU = 300
         
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
         
@@ -107,7 +107,7 @@ class Window:
                 
                 flipped_y_position = np.asarray( [object.positions[0] * self.AU_PIXELS_CONVERSION, self.WINDOW_HEIGHT - object.positions[1] * self.AU_PIXELS_CONVERSION] ) #refactor this
                 
-                pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius )
+                pygame.draw.circle(self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION )
             
                 self.update_velocity(object)
                 self.update_position(object) #Updating position here will cause inaccuraccy at small separation / high mass. Ideally in its own loop?
@@ -133,10 +133,14 @@ class Window:
         for other_object in self.object_list:
             if other_object.id == object.id: #do not compute force of object on itself
                 continue
-            
+
+
             if self.COLLISION_ON:
                 if self.points_colliding(object,other_object):
+
                     object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
+                    other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
+                    
                     return
             
             dx,dy = other_object.positions - object.positions
