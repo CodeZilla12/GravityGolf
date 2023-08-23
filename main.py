@@ -39,9 +39,6 @@ class Window:
         PIXELS_PER_AU = 200
         
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
-        
-        #for object in self.object_list: #temp fix. change unit tests
-        #    object.positions /= self.AU_PIXELS_CONVERSION
             
         self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
         
