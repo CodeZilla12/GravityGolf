@@ -48,7 +48,7 @@ class Window:
             self.object_list = point_mass_list
         
     
-    def generate_pointmass(self, velocities = None, mass = None):
+    def generate_pointmass(self, velocities = None, mass = None) -> PointMass:
         x = random.randint(0,self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION)
         y = random.randint(0,self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)
         
@@ -67,13 +67,13 @@ class Window:
         return PointMass([vx,vy],[x,y], mass, colour = color)
         
     @staticmethod
-    def points_colliding(point_a, point_b):
+    def points_colliding(point_a:PointMass, point_b:PointMass) -> bool:
         
         return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
         
         #(R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
     
-    def draw_scale_bar(self):
+    def draw_scale_bar(self) -> None:
     
         x1 = 50
         x2 = x1 + (1.5e11 * self.AU_PIXELS_CONVERSION)
@@ -86,7 +86,7 @@ class Window:
         pygame.draw.line(self.SCREEN, (255,255,255), (x2,self.WINDOW_HEIGHT-y-half_arm_width), (x2 ,self.WINDOW_HEIGHT-y+half_arm_width) )
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
     
-    def main_loop(self):
+    def main_loop(self) -> None:
         
         running = True
         
@@ -121,12 +121,12 @@ class Window:
             self.CLOCK.tick(30)
             
     
-    def update_position(self,object):
+    def update_position(self,object:PointMass) -> None:
     
         object.positions = object.positions + (object.velocities * self.DELTA_T)
         
         
-    def update_velocity(self,object):
+    def update_velocity(self,object:PointMass) -> None:
 
         """
         ΔVx = GMcos(θ)/(r*t)
