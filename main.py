@@ -4,12 +4,12 @@ import random
 
 class PointMass:
     
-    number_of_points = 0
+    number_of_point_masses = 0
 
-    def __init__(self, velocities, positions, mass, radius = 7e9, colour = (255,255,255) ):
+    def __init__(self, velocities:list, positions:list, mass:float, radius = 7e9, colour = (255,255,255) ) -> None:
          
-        self.id = PointMass.number_of_points
-        PointMass.number_of_points += 1
+        self.id = PointMass.number_of_point_masses
+        PointMass.number_of_point_masses += 1
         
         self.velocities = np.asarray(velocities, dtype = np.float64) 
         self.positions = np.asarray(positions, dtype = np.float64)
@@ -20,7 +20,7 @@ class PointMass:
         
 
 class Window:
-    def __init__(self,screen_size = (800,800), point_mass_list = None):
+    def __init__(self,screen_size = (800,800), point_mass_list = None) -> None:
         
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
         
