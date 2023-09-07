@@ -8,7 +8,15 @@ class PointMass:
     number_of_point_masses = 0
 
     def __init__(self, velocities: list, positions: list, mass: float, radius=7e9, colour=(255, 255, 255)) -> None:
+        """_summary_
 
+        Args:
+            velocities (list): _description_
+            positions (list): _description_
+            mass (float): _description_
+            radius (_type_, optional): _description_. Defaults to 7e9.
+            colour (tuple, optional): _description_. Defaults to (255, 255, 255).
+        """
         self.id = PointMass.number_of_point_masses
         PointMass.number_of_point_masses += 1
 
@@ -21,7 +29,12 @@ class PointMass:
 
 class Window:
     def __init__(self, screen_size=(800, 800), point_mass_list=None) -> None:
+        """_summary_
 
+        Args:
+            screen_size (tuple, optional): _description_. Defaults to (800, 800).
+            point_mass_list (_type_, optional): _description_. Defaults to None.
+        """
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
 
         pygame.init()
@@ -79,13 +92,23 @@ class Window:
 
     @staticmethod
     def points_colliding(point_a: PointMass, point_b: PointMass) -> bool:
+        """_summary_
+
+        Args:
+            point_a (PointMass): _description_
+            point_b (PointMass): _description_
+
+        Returns:
+            bool: _description_
+        """
 
         return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
 
         # (R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
 
     def draw_scale_bar(self) -> None:
-
+        """_summary_
+        """
         x1 = 50
         x2 = x1 + (1.5e11 * self.AU_PIXELS_CONVERSION)
 
@@ -102,7 +125,8 @@ class Window:
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
     def main_loop(self) -> None:
-
+        """_summary_
+        """
         running = True
 
         while running:
@@ -135,11 +159,21 @@ class Window:
             self.CLOCK.tick(30)
 
     def update_position(self, object: PointMass) -> None:
+        """_summary_
 
+        Args:
+            object (PointMass): _description_
+        """
         object.positions = object.positions + \
             (object.velocities * self.DELTA_T)
 
     def update_velocity(self, object: PointMass) -> None:
+        """_summary_
+
+        Args:
+            object (PointMass): _description_
+        """
+
         """
         ΔVx = GMcos(θ)/(r*t)
         ΔVy = GMsin(θ)/(r*t)
