@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 import random
-from point_mass import PointMass
+from point_mass import PointMass, generate_pointmass
 
 
 class Window:
@@ -35,37 +35,10 @@ class Window:
 
         if not point_mass_list:
             # generate range(N) random pointmasses
-            self.object_list = [self.generate_pointmass() for _ in range(50)]
+            self.object_list = [generate_pointmass(
+                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(50)]
         else:
             self.object_list = point_mass_list
-
-    def generate_pointmass(self, velocities=None, mass=None) -> PointMass:
-        """_summary_
-
-        Args:
-            velocities (_type_, list): _description_ List of length two containing x&y velocity respectively. Defaults to None.
-            mass (_type_, float): _description_ Mass of the pointmass. Defaults to None.
-            None values are randomly generated.
-
-        Returns:
-            PointMass: _description_ Returns a PointMass object with random or defined properties based on input.
-        """
-        x = random.randint(0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION)
-        y = random.randint(0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)
-
-        if velocities is None:
-            vx = random.randint(-1e5, +1e5)
-            vy = random.randint(-1e5, +1e5)
-
-        if velocities:
-            vx, vy = velocities
-
-        if mass is None:
-            mass = random.randint(10e10, 10e27)
-
-        color = tuple(random.randint(0, 255) for _ in range(3))
-
-        return PointMass([vx, vy], [x, y], mass, colour=color)
 
     @staticmethod
     def points_colliding(point_a: PointMass, point_b: PointMass) -> bool:
