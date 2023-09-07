@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
     AU = 1.5e11
     screen_size = (800, 800)
-    # Solar system test. Does not work unless 1e6x actual velocities. Likely to do with the fps.
+    # Solar system test. Does not work unless 1e6x actual velocities.
     point_list = [
 
         PointMass([30e10, -30e10], [2*AU, 3.5*AU], 6e24),
