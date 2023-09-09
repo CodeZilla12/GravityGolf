@@ -1,7 +1,7 @@
 import pygame
 import numpy as np
 import random
-from point_mass import PointMass, generate_pointmass
+from point_mass import PointMass, generate_pointmass, points_colliding
 
 
 class Window:
@@ -39,22 +39,6 @@ class Window:
                 (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(20)]
         else:
             self.object_list = point_mass_list
-
-    @staticmethod
-    def points_colliding(point_a: PointMass, point_b: PointMass) -> bool:
-        """_summary_
-
-        Args:
-            point_a (PointMass): _description_
-            point_b (PointMass): _description_
-
-        Returns:
-            bool: _description_
-        """
-
-        return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
-
-        # (R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
 
     def draw_scale_bar(self) -> None:
         """_summary_
@@ -134,7 +118,7 @@ class Window:
                 continue
 
             if self.COLLISION_ON:
-                if self.points_colliding(object, other_object):
+                if points_colliding(object, other_object):
 
                     object.attached_point_masses_set.add(other_object)
                     other_object.is_sub_object = True

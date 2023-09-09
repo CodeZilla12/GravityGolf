@@ -64,3 +64,19 @@ def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
     color = tuple(random.randint(0, 255) for _ in range(3))
 
     return PointMass([vx, vy], [x, y], mass, colour=color)
+
+
+def points_colliding(point_a: PointMass, point_b: PointMass) -> bool:
+    """_summary_
+
+    Args:
+        point_a (PointMass): _description_
+        point_b (PointMass): _description_
+
+    Returns:
+        bool: _description_
+    """
+
+    return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
+
+    # (R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
