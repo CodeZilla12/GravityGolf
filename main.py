@@ -140,7 +140,7 @@ class Window:
                     other_object.is_sub_object = True
 
                     # coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
-                    # repulsion = (9*object.collective_mass*1e-19)
+                    # repulsion = (9*other_object.collective_mass*1e-19)
 
                     # object.velocities += - \
                     #     np.sign(object.velocities) * repulsion
@@ -163,10 +163,11 @@ class Window:
 
             separation = np.hypot(dx, dy)
 
+            # todo: this line uses collective_mass, which reverses the expected behaviour.
             object.velocities += np.asarray([
-                self.G * object.collective_mass *
+                self.G * other_object.collective_mass *
                 np.cos(angle) / (separation * self.DELTA_T),
-                self.G * object.collective_mass *
+                self.G * other_object.collective_mass *
                 np.sin(angle) / (separation * self.DELTA_T)
             ], dtype=np.float64)  # [delta_vx, delta_vy]
 
@@ -185,6 +186,6 @@ if __name__ == '__main__':
         PointMass([-30e10, +30e10], [2*AU, 1*AU], 6e24)
     ]
 
-    point_list = None
+    # point_list = None
 
     Window(screen_size, point_list).main_loop()
