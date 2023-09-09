@@ -22,7 +22,7 @@ class Window:
         self.DELTA_T = 1/self.FPS  # change this to scale off of frame-time
 
         # self.LOSS_ON_COLLISION = 0.7 #multiplicative
-        self.COLLISION_ON = False
+        self.COLLISION_ON = True
 
         self.G = 6.67e-11  # gravitational constant
 
@@ -136,19 +136,25 @@ class Window:
             if self.COLLISION_ON:
                 if self.points_colliding(object, other_object):
 
-                    # coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
-                    repulsion = (9*other_object.mass*1e-19)
+                    object.attached_point_masses_set.add(other_object)
+                    other_object.is_sub_object = True
 
-                    object.velocities += - \
-                        np.sign(object.velocities) * repulsion
-                    other_object.velocities += - \
-                        np.sign(other_object.velocities) * repulsion
+                    # coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
+                    # repulsion = (9*object.collective_mass*1e-19)
+
+                    # object.velocities += - \
+                    #     np.sign(object.velocities) * repulsion
+                    # other_object.velocities += - \
+                    #     np.sign(other_object.velocities) * repulsion
 
                     # old collision detection
                     # object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     # other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
 
                     continue  # needed so masses don't slowly sink into each other's center
+
+            if object.is_sub_object:
+                return
 
             dx, dy = other_object.positions - object.positions
 
@@ -158,11 +164,13 @@ class Window:
             separation = np.hypot(dx, dy)
 
             object.velocities += np.asarray([
-                self.G * other_object.mass *
+                self.G * object.collective_mass *
                 np.cos(angle) / (separation * self.DELTA_T),
-                self.G * other_object.mass *
+                self.G * object.collective_mass *
                 np.sin(angle) / (separation * self.DELTA_T)
             ], dtype=np.float64)  # [delta_vx, delta_vy]
+
+            object.update_attached_point_masses()
 
 
 if __name__ == '__main__':
