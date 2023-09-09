@@ -22,7 +22,7 @@ class Window:
         self.DELTA_T = 1/self.FPS  # change this to scale off of frame-time
 
         # self.LOSS_ON_COLLISION = 0.7 #multiplicative
-        self.COLLISION_ON = True
+        self.COLLISION_ON = False
 
         self.G = 6.67e-11  # gravitational constant
 
@@ -36,7 +36,7 @@ class Window:
         if not point_mass_list:
             # generate range(N) random pointmasses
             self.object_list = [generate_pointmass(
-                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(50)]
+                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(20)]
         else:
             self.object_list = point_mass_list
 
