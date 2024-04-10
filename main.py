@@ -43,8 +43,10 @@ class Window:
     def draw_scale_bar(self) -> None:
         """_summary_
         """
+
+        ONE_AU = 1.5e11
         x1 = 50
-        x2 = x1 + (1.5e11 * self.AU_PIXELS_CONVERSION)
+        x2 = x1 + (ONE_AU * self.AU_PIXELS_CONVERSION)
 
         y = 50
         half_arm_width = 25
