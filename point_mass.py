@@ -19,11 +19,16 @@ class PointMass:
         self.id = PointMass.number_of_point_masses
         PointMass.number_of_point_masses += 1
 
+        self.is_deleted = False
+
         self.velocities = np.asarray(velocities, dtype=np.float64)
         self.positions = np.asarray(positions, dtype=np.float64)
         self.mass = mass
         self.radius = radius
         self.colour = colour
+
+    def __del__(self):
+        print("Test Del")
 
 
 def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
