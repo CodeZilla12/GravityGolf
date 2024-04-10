@@ -18,7 +18,7 @@ class Window:
         self.SCREEN = pygame.display.set_mode(
             [self.WINDOW_WIDTH, self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 60
+        self.FPS = 30
         self.DELTA_T = 1/self.FPS  # change this to scale off of frame-time
 
         # self.LOSS_ON_COLLISION = 0.7 #multiplicative
@@ -76,8 +76,12 @@ class Window:
 
             for object in self.object_list:
 
-                flipped_y_position = np.asarray([object.positions[0] * self.AU_PIXELS_CONVERSION,
-                                                self.WINDOW_HEIGHT - object.positions[1] * self.AU_PIXELS_CONVERSION])  # refactor this
+                pixel_x = object.positions[0] * self.AU_PIXELS_CONVERSION
+                pixel_y = self.WINDOW_HEIGHT - \
+                    object.positions[1] * self.AU_PIXELS_CONVERSION
+
+                flipped_y_position = np.asarray(
+                    [pixel_x, pixel_y])  # refactor this
 
                 pygame.draw.circle(
                     self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION)
@@ -86,13 +90,14 @@ class Window:
 
                 self.update_position(object)
 
+            # ???
             # do this instead for more precise results
             # for object in self.object_list:
             #    self.update_position(object)
 
             pygame.display.flip()
 
-            self.CLOCK.tick(30)
+            self.CLOCK.tick(self.FPS)
 
     def update_position(self, object: PointMass) -> None:
         """_summary_
