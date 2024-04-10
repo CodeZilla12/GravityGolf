@@ -25,17 +25,6 @@ class PointMass:
         self.radius = radius
         self.colour = colour
 
-        # is it attached to another point_mass?
-        self.is_sub_object = False
-
-        self.attached_point_masses_set = set()
-        self.collective_mass = np.sum(
-            [object.mass for object in self.attached_point_masses_set]) + self.mass
-
-    def update_attached_point_masses(self):
-        for point_mass in self.attached_point_masses_set:
-            point_mass.velocities = self.velocities
-
 
 def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
     """_summary_

@@ -127,8 +127,10 @@ class Window:
             if self.COLLISION_ON:
                 if points_colliding(object, other_object):
 
-                    object.attached_point_masses_set.add(other_object)
-                    other_object.is_sub_object = True
+                    pass
+
+                    # object.attached_point_masses_set.add(other_object)
+                    # other_object.is_sub_object = True
 
                     # coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
                     # repulsion = (9*other_object.collective_mass*1e-19)
@@ -142,10 +144,7 @@ class Window:
                     # object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
                     # other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
 
-                    continue  # needed so masses don't slowly sink into each other's center
-
-            if object.is_sub_object:
-                return
+                    # continue  # needed so masses don't slowly sink into each other's center
 
             dx, dy = other_object.positions - object.positions
 
@@ -156,13 +155,11 @@ class Window:
 
             # todo: this line uses collective_mass, which reverses the expected behaviour.
             object.velocities += np.asarray([
-                self.G * other_object.collective_mass *
+                self.G * other_object.mass *
                 np.cos(angle) / (separation * self.DELTA_T),
-                self.G * other_object.collective_mass *
+                self.G * other_object.mass *
                 np.sin(angle) / (separation * self.DELTA_T)
             ], dtype=np.float64)  # [delta_vx, delta_vy]
-
-            object.update_attached_point_masses()
 
 
 if __name__ == '__main__':
