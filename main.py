@@ -92,8 +92,8 @@ class Window:
 
             # ???
             # do this instead for more precise results
-            # for object in self.object_list:
-            #    self.update_position(object)
+            for object in self.object_list:
+                self.update_position(object)
 
             pygame.display.flip()
 
@@ -169,12 +169,12 @@ if __name__ == '__main__':
 
     AU = 1.5e11
     screen_size = (800, 800)
-    # Solar system test. Does not work unless 1e6x actual velocities.
+    # Solar system test. Does not work unless 1e6x actual velocities. Gravity too strong.
     point_list = [
 
-        PointMass([30e10, -30e10], [2*AU, 3.5*AU], 6e24),
+        PointMass([30e10, -30e9], [2*AU, 3.5*AU], 6e24),
         PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
-        PointMass([-30e10, +30e10], [2*AU, 1*AU], 6e24)
+        PointMass([-30e10, +30e9], [2*AU, 1*AU], 6e24)
     ]
 
     # point_list = None
