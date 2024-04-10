@@ -76,26 +76,34 @@ class Window:
 
             for object in self.object_list:
 
+                if object.is_deleted:
+                    continue
+
                 pixel_x = object.positions[0] * self.AU_PIXELS_CONVERSION
                 pixel_y = self.WINDOW_HEIGHT - \
                     object.positions[1] * self.AU_PIXELS_CONVERSION
 
                 flipped_y_position = np.asarray(
-                    [pixel_x, pixel_y])  # refactor this
+                    [pixel_x, pixel_y])
 
                 pygame.draw.circle(
                     self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION)
 
                 self.update_object(object)
 
+            for object in self.object_list:
+                if object.is_deleted:
+                    self.object_list.remove(object)
+
             # ???
             # do this instead for more precise results
             # for object in self.object_list:
             #    self.update_position(object)
 
-            pygame.display.flip()
+            pygame.display.flip()  # update drawing canvas
 
-            self.CLOCK.tick(self.FPS)
+            # This doesn't work properly. Simulation speed dependend on FPS.
+            self.DELTA_T = self.CLOCK.tick(self.FPS) * 1e-3
 
     def update_object(self, object: PointMass) -> None:
         """_summary_
@@ -118,7 +126,22 @@ class Window:
             if self.COLLISION_ON:
                 if points_colliding(object, other_object):
 
-                    pass
+                    other_object.is_deleted = True
+
+                    combined_mass = object.mass + other_object.mass  # absorb other_object into object
+
+                    # object retains its position.
+
+                    print(object.velocities)
+
+                    object.velocities = (
+                        object.mass*object.velocities + other_object.mass*other_object.velocities) / combined_mass
+
+                    print(object.velocities)
+
+                    object.mass = combined_mass
+
+                    continue
 
                     # object.attached_point_masses_set.add(other_object)
                     # other_object.is_sub_object = True
@@ -162,11 +185,14 @@ if __name__ == '__main__':
     AU = 1.5e11
     screen_size = (800, 800)
     # Solar system test. Does not work unless 1e6x actual velocities. Gravity too strong.
+    # Even then orbits much faster than real-time.
     point_list = [
+        PointMass([0, 0], [2*AU, 3.5*AU], 6e24),
+        PointMass([-5e10, 0], [3*AU, 3.5*AU], 6e24)
 
-        PointMass([30e10, -30e9], [2*AU, 3.5*AU], 6e24),
-        PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
-        PointMass([-30e10, +30e9], [2*AU, 1*AU], 6e24)
+        # PointMass([30e10, -30e9], [2*AU, 3.5*AU], 6e24),
+        # PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0))
+        # PointMass([-30e10, +30e9], [2*AU, 1*AU], 6e24)
     ]
 
     # point_list = None
