@@ -86,29 +86,18 @@ class Window:
                 pygame.draw.circle(
                     self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION)
 
-                self.update_velocity(object)
-
-                self.update_position(object)
+                self.update_object(object)
 
             # ???
             # do this instead for more precise results
-            for object in self.object_list:
-                self.update_position(object)
+            # for object in self.object_list:
+            #    self.update_position(object)
 
             pygame.display.flip()
 
             self.CLOCK.tick(self.FPS)
 
-    def update_position(self, object: PointMass) -> None:
-        """_summary_
-
-        Args:
-            object (PointMass): _description_
-        """
-        object.positions = object.positions + \
-            (object.velocities * self.DELTA_T)
-
-    def update_velocity(self, object: PointMass) -> None:
+    def update_object(self, object: PointMass) -> None:
         """_summary_
 
         Args:
@@ -119,6 +108,8 @@ class Window:
         ΔVx = GMcos(θ)/(r*t)
         ΔVy = GMsin(θ)/(r*t)
         """
+
+        # The issue with the strong gravity likely lies in how the objects are used in loops.
 
         for other_object in self.object_list:
             if other_object.id == object.id:  # do not compute force of object on itself
@@ -153,13 +144,17 @@ class Window:
 
             separation = np.hypot(dx, dy)
 
-            # todo: this line uses collective_mass, which reverses the expected behaviour.
-            object.velocities += np.asarray([
-                self.G * other_object.mass *
-                np.cos(angle) / (separation * self.DELTA_T),
-                self.G * other_object.mass *
+            delta_vx = self.G * other_object.mass * \
+                np.cos(angle) / (separation * self.DELTA_T)
+            delta_vy = self.G * other_object.mass * \
                 np.sin(angle) / (separation * self.DELTA_T)
-            ], dtype=np.float64)  # [delta_vx, delta_vy]
+
+            # [delta_vx, delta_vy]
+            object.velocities += np.asarray([delta_vx,
+                                            delta_vy], dtype=np.float64)
+
+        object.positions = object.positions + \
+            (object.velocities * self.DELTA_T)
 
 
 if __name__ == '__main__':
