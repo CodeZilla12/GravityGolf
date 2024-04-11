@@ -19,9 +19,12 @@ class Window:
             [self.WINDOW_WIDTH, self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
         self.FPS = 60
+
         # sufficiently small arbritrary number. Redefined in main loop.
         self.DELTA_T = 1/self.FPS
-        self.TIME_MULT = 3e6
+
+        self.TIME_MULT = 1e5
+        # self.TIME_MULT = 3e6
 
         # self.LOSS_ON_COLLISION = 0.7 #multiplicative
         self.COLLISION_ON = True
@@ -38,7 +41,7 @@ class Window:
         if not point_mass_list:
             # generate range(N) random pointmasses
             self.object_list = [generate_pointmass(
-                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(20)]
+                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(100)]
         else:
             self.object_list = point_mass_list
 
@@ -119,8 +122,6 @@ class Window:
         ΔVy = GMsin(θ)/(r*t)
         """
 
-        # The issue with the strong gravity likely lies in how the objects are used in loops.
-
         for other_object in self.object_list:
             if other_object.id == object.id:  # do not compute force of object on itself
                 continue
@@ -128,18 +129,25 @@ class Window:
             if self.COLLISION_ON:
                 if points_colliding(object, other_object):
 
-                    other_object.is_deleted = True
+                    larger_object = (object, other_object)[
+                        np.argmax((object.mass, other_object.mass))]
 
-                    combined_mass = object.mass + other_object.mass  # absorb other_object into object
+                    smaller_object = (object, other_object)[
+                        np.argmin((object.mass, other_object.mass))]
 
-                    # object retains its position.
+                    smaller_object.is_deleted = True
 
-                    object.velocities = (
+                    combined_mass = object.mass + other_object.mass
+
+                    # Inelastic collision / conservation of momentum
+                    larger_object.velocities = (
                         object.mass*object.velocities + other_object.mass*other_object.velocities) / combined_mass
 
-                    object.mass = combined_mass
+                    larger_object.mass = combined_mass
 
-                    continue
+                    larger_object.radius = larger_object.radius + smaller_object.radius//4
+
+                    return
 
                     # object.attached_point_masses_set.add(other_object)
                     # other_object.is_sub_object = True
@@ -183,13 +191,10 @@ if __name__ == '__main__':
 
     AU = 1.5e11
     screen_size = (800, 800)
-    # Solar system test. Does not work unless 1e6x actual velocities. Gravity too strong.
-    # Even then orbits much faster than real-time.
-    point_list = [
-        # PointMass([0, 0], [2*AU, 3.5*AU], 6e24),
-        # PointMass([-5e10, 0], [3*AU, 3.5*AU], 6e24)
 
-        PointMass([-30e3, 0], [2*AU, 3*AU], 6e24),
+    # solar system case
+    point_list = [
+        PointMass([-30e3, 0], [2*AU, 3*AU], 6e28),
         PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
         PointMass([+30e3, 0], [2*AU, 1*AU], 6e24)
     ]
