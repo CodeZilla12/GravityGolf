@@ -20,13 +20,12 @@ class Window:
         self.CLOCK = pygame.time.Clock()
         self.FPS = 60
 
-        # sufficiently small arbritrary number. Redefined in main loop.
+        # Sufficiently small arbritrary number for first frame. Redefined in main loop.
         self.DELTA_T = 1/self.FPS
 
         self.TIME_MULT = 1e5
         # self.TIME_MULT = 3e6
 
-        # self.LOSS_ON_COLLISION = 0.7 #multiplicative
         self.COLLISION_ON = True
 
         self.G = 6.67e-11  # gravitational constant
@@ -38,6 +37,7 @@ class Window:
 
         self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
 
+        # Probably a cleaner way to have this functionality.
         if not point_mass_list:
             # generate range(N) random pointmasses
             self.object_list = [generate_pointmass(
@@ -100,15 +100,9 @@ class Window:
                 if object.is_deleted:
                     self.object_list.remove(object)
 
-            # ???
-            # do this instead for more precise results
-            # for object in self.object_list:
-            #    self.update_position(object)
-
             pygame.display.flip()  # update drawing canvas
 
             self.DELTA_T = self.CLOCK.tick(self.FPS) * 1e-3
-            # self.DELTA_T = 1
 
     def update_object(self, object: PointMass) -> None:
         """_summary_
@@ -123,7 +117,7 @@ class Window:
         """
 
         for other_object in self.object_list:
-            if other_object.id == object.id:  # do not compute force of object on itself
+            if other_object.id == object.id:  # Do not compute force of object on itself
                 continue
 
             if self.COLLISION_ON:
@@ -145,44 +139,29 @@ class Window:
 
                     larger_object.mass = combined_mass
 
+                    # Smaller object scaled by 1/4 to more accurately model absorption and to limit exponential growth
                     larger_object.radius = larger_object.radius + smaller_object.radius//4
 
+                    # Returns here to avoid unintended behaviour from deleting object. May cause time inaccuracies if low fps or many collisions
                     return
-
-                    # object.attached_point_masses_set.add(other_object)
-                    # other_object.is_sub_object = True
-
-                    # coulomb repulsion term. Only occurs on contact. Derive this quantity properly at some point.
-                    # repulsion = (9*other_object.collective_mass*1e-19)
-
-                    # object.velocities += - \
-                    #     np.sign(object.velocities) * repulsion
-                    # other_object.velocities += - \
-                    #     np.sign(other_object.velocities) * repulsion
-
-                    # old collision detection
-                    # object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
-                    # other_object.velocities = -1 * object.velocities * self.LOSS_ON_COLLISION
-
-                    # continue  # needed so masses don't slowly sink into each other's center
 
             dx, dy = other_object.positions - object.positions
 
-            # quadrant-based arctan. Corrects for discrepancies based on sign flipping
+            # Quadrant-based arctan. Corrects for discrepancies based on sign flipping
             angle = np.arctan2(dy, dx)
 
             separation = np.hypot(dx, dy)
 
-            # This is the change in velocity due to each object.
+            # Sums the velocities due to pull from each mass. Same as net forces.
             delta_v = (self.G * other_object.mass *
                        self.DELTA_T) / (separation**2)
             delta_vx = delta_v * np.cos(angle) * self.TIME_MULT
             delta_vy = delta_v * np.sin(angle) * self.TIME_MULT
 
-            # [delta_vx, delta_vy]
             object.velocities += np.asarray([delta_vx,
                                             delta_vy], dtype=np.float64)
 
+        # Updates positions with *Net* velocities, hence why outside the loop. Reduces number of calculations per frame.
         object.positions = object.positions + \
             (object.velocities * self.DELTA_T * self.TIME_MULT)
 
