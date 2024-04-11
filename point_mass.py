@@ -31,7 +31,7 @@ class PointMass:
         print("Test Del")
 
 
-def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
+def generate_pointmass(xrange=None, yrange=None, velocities=None, mass=None, x=0, y=0) -> PointMass:
     """_summary_
 
     Args:
@@ -42,8 +42,9 @@ def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
     Returns:
         PointMass: _description_ Returns a PointMass object with random or defined properties based on input.
     """
-    x = random.randint(*xrange)
-    y = random.randint(*yrange)
+    if x == 0 and y == 0:
+        x = random.randint(*xrange)
+        y = random.randint(*yrange)
 
     if velocities is None:
         vx = random.randint(-1e3, +1e3)
