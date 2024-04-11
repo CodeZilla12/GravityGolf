@@ -46,14 +46,14 @@ def generate_pointmass(xrange, yrange, velocities=None, mass=None) -> PointMass:
     y = random.randint(*yrange)
 
     if velocities is None:
-        vx = random.randint(-1e5, +1e5)
-        vy = random.randint(-1e5, +1e5)
+        vx = random.randint(-1e3, +1e3)
+        vy = random.randint(-1e3, +1e3)
 
     if velocities:
         vx, vy = velocities
 
     if mass is None:
-        mass = random.randint(10e10, 10e27)
+        mass = random.randint(1e10, 1e30)
 
     color = tuple(random.randint(0, 255) for _ in range(3))
 
