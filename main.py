@@ -18,8 +18,10 @@ class Window:
         self.SCREEN = pygame.display.set_mode(
             [self.WINDOW_WIDTH, self.WINDOW_HEIGHT])
         self.CLOCK = pygame.time.Clock()
-        self.FPS = 30
-        self.DELTA_T = 1/self.FPS  # change this to scale off of frame-time
+        self.FPS = 60
+        # sufficiently small arbritrary number. Redefined in main loop.
+        self.DELTA_T = 1/self.FPS
+        self.TIME_MULT = 3e6
 
         # self.LOSS_ON_COLLISION = 0.7 #multiplicative
         self.COLLISION_ON = True
@@ -102,8 +104,8 @@ class Window:
 
             pygame.display.flip()  # update drawing canvas
 
-            # This doesn't work properly. Simulation speed dependend on FPS.
             self.DELTA_T = self.CLOCK.tick(self.FPS) * 1e-3
+            # self.DELTA_T = 1
 
     def update_object(self, object: PointMass) -> None:
         """_summary_
@@ -132,12 +134,8 @@ class Window:
 
                     # object retains its position.
 
-                    print(object.velocities)
-
                     object.velocities = (
                         object.mass*object.velocities + other_object.mass*other_object.velocities) / combined_mass
-
-                    print(object.velocities)
 
                     object.mass = combined_mass
 
@@ -167,17 +165,18 @@ class Window:
 
             separation = np.hypot(dx, dy)
 
-            delta_vx = self.G * other_object.mass * \
-                np.cos(angle) / (separation * self.DELTA_T)
-            delta_vy = self.G * other_object.mass * \
-                np.sin(angle) / (separation * self.DELTA_T)
+            # This is the change in velocity due to each object.
+            delta_v = (self.G * other_object.mass *
+                       self.DELTA_T) / (separation**2)
+            delta_vx = delta_v * np.cos(angle) * self.TIME_MULT
+            delta_vy = delta_v * np.sin(angle) * self.TIME_MULT
 
             # [delta_vx, delta_vy]
             object.velocities += np.asarray([delta_vx,
                                             delta_vy], dtype=np.float64)
 
         object.positions = object.positions + \
-            (object.velocities * self.DELTA_T)
+            (object.velocities * self.DELTA_T * self.TIME_MULT)
 
 
 if __name__ == '__main__':
@@ -187,12 +186,12 @@ if __name__ == '__main__':
     # Solar system test. Does not work unless 1e6x actual velocities. Gravity too strong.
     # Even then orbits much faster than real-time.
     point_list = [
-        PointMass([0, 0], [2*AU, 3.5*AU], 6e24),
-        PointMass([-5e10, 0], [3*AU, 3.5*AU], 6e24)
+        # PointMass([0, 0], [2*AU, 3.5*AU], 6e24),
+        # PointMass([-5e10, 0], [3*AU, 3.5*AU], 6e24)
 
-        # PointMass([30e10, -30e9], [2*AU, 3.5*AU], 6e24),
-        # PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0))
-        # PointMass([-30e10, +30e9], [2*AU, 1*AU], 6e24)
+        PointMass([-30e3, 0], [2*AU, 3*AU], 6e24),
+        PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
+        PointMass([+30e3, 0], [2*AU, 1*AU], 6e24)
     ]
 
     # point_list = None
