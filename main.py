@@ -96,6 +96,7 @@ class Window:
 
                 self.update_object(object)
 
+            # Could be a list comprehension / map
             for object in self.object_list:
                 if object.is_deleted:
                     self.object_list.remove(object)
@@ -171,13 +172,14 @@ if __name__ == '__main__':
     AU = 1.5e11
     screen_size = (800, 800)
 
-    # solar system case
+    # Two earths orbiting the sun test
     point_list = [
         PointMass([-30e3, 0], [2*AU, 3*AU], 6e28),
         PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
         PointMass([+30e3, 0], [2*AU, 1*AU], 6e24)
     ]
 
+    #
     # point_list = None
 
     Window(screen_size, point_list).main_loop()
