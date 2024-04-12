@@ -30,7 +30,7 @@ class Window:
 
         self.G = 6.67e-11  # gravitational constant
 
-        self.slingshot_power = 1  # Multiplies the power the slingshot input has
+        self.slingshot_power = 1e3  # Multiplies the power the slingshot input has
         self.mouse_click_coordinate_pixels = [None, None]
 
         ONE_AU = 1.5e11
@@ -68,6 +68,9 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
+    def draw_arrow(self, start_pos, end_pos) -> None:
+        pygame.draw(self.SCREEN, (255, 255, 255), start_pos, end_pos)
+
     def event_handler(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -90,15 +93,6 @@ class Window:
 
                     self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
 
-                    au_x = mouse_x / self.AU_PIXELS_CONVERSION
-                    au_y = (self.WINDOW_HEIGHT - mouse_y) / \
-                        self.AU_PIXELS_CONVERSION
-
-                    # self.object_list.append(
-                    # PointMass([0, 0], [au_x,
-                    #   au_y], 1e26, 7e9)
-                    # )
-
             elif event.type == pygame.MOUSEBUTTONUP:
                 left_mouse_released = not pygame.mouse.get_pressed()[0]
 
@@ -112,6 +106,22 @@ class Window:
 
                     dy = stored_y - mouse_y
                     dx = stored_x - mouse_x
+
+                    vx = dx * self.slingshot_power
+                    vy = - dy * self.slingshot_power
+
+                    au_x = stored_x / self.AU_PIXELS_CONVERSION
+                    au_y = (self.WINDOW_HEIGHT - stored_y) / \
+                        self.AU_PIXELS_CONVERSION
+
+                    self.object_list.append(
+                        PointMass([vx, vy], [au_x,
+                                             au_y], 1e26, 7e9)
+                    )
+
+                    self.mouse_click_coordinate_pixels = [None, None]
+
+        return True
 
     def main_loop(self) -> None:
         """_summary_
