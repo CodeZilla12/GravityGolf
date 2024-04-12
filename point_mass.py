@@ -28,10 +28,10 @@ class PointMass:
         self.colour = colour
 
     def __del__(self):
-        print("Test Del")
+        pass
 
 
-def generate_pointmass(xrange=None, yrange=None, velocities=None, mass=None, x=0, y=0) -> PointMass:
+def generate_pointmass(xrange=None, yrange=None, velocities=None, mass=None) -> PointMass:
     """_summary_
 
     Args:
@@ -42,9 +42,9 @@ def generate_pointmass(xrange=None, yrange=None, velocities=None, mass=None, x=0
     Returns:
         PointMass: _description_ Returns a PointMass object with random or defined properties based on input.
     """
-    if x == 0 and y == 0:
-        x = random.randint(*xrange)
-        y = random.randint(*yrange)
+
+    x = random.randint(*xrange)
+    y = random.randint(*yrange)
 
     if velocities is None:
         vx = random.randint(-1e3, +1e3)
