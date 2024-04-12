@@ -4,6 +4,14 @@ import random
 from point_mass import PointMass, generate_pointmass, points_colliding
 
 
+class Planet:
+    def __init__(self, name, mass, colour):
+        # could be a dataclass instead
+        self.name = name
+        self.mass = mass
+        self.colour = colour
+
+
 class Window:
     def __init__(self, screen_size=(800, 800), point_mass_list=None) -> None:
         """_summary_
@@ -12,6 +20,24 @@ class Window:
             screen_size (tuple, optional): _description_. Defaults to (800, 800).
             point_mass_list (_type_, optional): _description_. Defaults to None.
         """
+
+        # Dictionary of all planets and their masses(kg) and colours(rgb)
+
+        self.planet_list = [
+            Planet("Sun", 2e30, (255, 100, 0)),
+            Planet("Mercury", 0.330e24, (255, 50, 50)),
+            Planet("Venus", 4.87e24, (255, 144, 33)),
+            Planet("Earth", 5.97e24, (90, 255, 28)),
+            Planet("Mars", 0.642e24, (255, 132, 79)),
+            Planet("Jupiter", 1898e24, (156, 81, 48)),
+            Planet("Saturn", 568e24, (156, 119, 72)),
+            Planet("Uranus", 86.8e24, (61, 96, 156)),
+            Planet("Neptune", 102e24, (0, 0, 255)),
+            Planet("Pluto", 0.0130e24, (204, 215, 222))
+        ]
+
+        self.selected_planet = 2
+
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
 
         pygame.init()
@@ -175,6 +201,12 @@ class Window:
                     self.time_mult *= 5
                     self.show_notification(f"x{self.time_mult:.0f} Speed")
 
+                elif event.unicode.isdigit():
+                    self.selected_planet = int(event.unicode)
+                    print(event.key)
+                    self.show_notification(
+                        self.planet_list[self.selected_planet].name)
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 left_mouse_pressed = pygame.mouse.get_pressed()[0]
 
@@ -197,9 +229,11 @@ class Window:
 
                     au_x, au_y, vx, vy = au_vel
 
+                    planet = self.planet_list[self.selected_planet]
+
                     self.object_list.append(
                         PointMass([vx, vy], [au_x,
-                                             au_y], 1e26, 7e9)
+                                             au_y], planet.mass, 7e9, colour=planet.colour)
                     )
 
                     self.mouse_click_coordinate_pixels = [None, None]
