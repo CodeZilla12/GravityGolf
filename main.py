@@ -23,7 +23,10 @@ class Window:
         # Sufficiently small arbritrary number for first frame. Redefined in main loop.
         self.DELTA_T = 1/self.FPS
 
-        self.TIME_MULT = 1e5
+        self.TIME_MULT = 1e6
+
+        self.seconds_passed = 0
+
         # self.TIME_MULT = 3e6
 
         self.COLLISION_ON = True
@@ -68,6 +71,13 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
+        self.seconds_passed += self.DELTA_T * self.TIME_MULT
+
+        years_passed = round(self.seconds_passed / (3600*24*365), 2)
+
+        self.SCALE_BAR_FONT.render_to(self.SCREEN, (
+            x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{years_passed} Years Passed", (250, 250, 250))
+
     def calculate_slingshot_velocity(self) -> tuple:
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -80,8 +90,7 @@ class Window:
         dx = stored_x - mouse_x
 
         au_x = stored_x / self.AU_PIXELS_CONVERSION
-        au_y = (self.WINDOW_HEIGHT - stored_y) / \
-            self.AU_PIXELS_CONVERSION
+        au_y = (self.WINDOW_HEIGHT - stored_y) / self.AU_PIXELS_CONVERSION
 
         coordinates_au = [au_x, au_y]
 
@@ -97,6 +106,13 @@ class Window:
         new_end_pos = (2*start_pos - end_pos)
 
         pygame.draw.line(self.SCREEN, (255, 255, 255), start_pos, new_end_pos)
+
+        _, _, vx, vy = self.calculate_slingshot_velocity()
+
+        velocity = f"{round(np.hypot(vx, vy)*1e-3)}Km/s"
+
+        self.SCALE_BAR_FONT.render_to(
+            self.SCREEN, new_end_pos + 10, str(velocity), (250, 250, 250))
 
         # ARROW_ANGLE = np.radians(-15)
         # rotMatrix = np.array([[np.cos(ARROW_ANGLE), -np.sin(ARROW_ANGLE)],
@@ -145,6 +161,7 @@ class Window:
 
                     au_vel = self.calculate_slingshot_velocity()
 
+                    # if no stored coordinates
                     if au_vel is None:
                         break
 
