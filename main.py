@@ -29,6 +29,9 @@ class Window:
 
         self.COLLISION_ON = True
 
+        self.notification_opacity = 1
+        self.notification_text = ""
+
         self.G = 6.67e-11  # gravitational constant
 
         self.slingshot_power = 2e2  # Multiplies the power the slingshot input has
@@ -77,7 +80,7 @@ class Window:
             x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{round(years_passed)} Years {months_passed} Month(s) Passed", (250, 250, 250))
 
     def calculate_slingshot_velocity(self) -> tuple:
-
+        # function name likely needs changing
         mouse_x, mouse_y = pygame.mouse.get_pos()
         stored_x, stored_y = self.mouse_click_coordinate_pixels
 
@@ -98,6 +101,26 @@ class Window:
         velocities = [vx, vy]
 
         return au_x, au_y, vx, vy
+
+    def show_notification(self, text=None) -> None:
+        x = 10
+        y = 50
+
+        if text:
+            self.notification_text = text
+            self.notification_opacity = 1
+
+        color = np.array((250, 250, 250), dtype=np.int32) * \
+            self.notification_opacity
+        if any(color) < 0:
+            self.notification_opacity = 1
+            self.notification_text = ""
+
+        self.SCALE_BAR_FONT.render_to(
+            self.SCREEN, (x, y), self.notification_text, color)
+
+        NOTIFICATION_FADEOUT = 0.98
+        self.notification_opacity *= NOTIFICATION_FADEOUT
 
     def draw_arrow(self, start_pos, end_pos) -> None:
 
@@ -141,7 +164,7 @@ class Window:
                 if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
                     self.mouse_click_coordinate_pixels = [
                         None, None]  # Cancel action
-                    print("Input Cancelled.")
+                    self.show_notification("Input Cancelled")
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 left_mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -208,10 +231,12 @@ class Window:
                 # updates velocity and position based on gravitational attraction
                 self.update_object(object)
 
-            # Could be a list comprehension / map
+            # Objects not removed mid-iteration to avoid issues
             for object in self.object_list:
                 if object.is_deleted:
                     self.object_list.remove(object)
+
+            self.show_notification()
 
             pygame.display.flip()  # update drawing canvas
 
