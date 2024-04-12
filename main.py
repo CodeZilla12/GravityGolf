@@ -70,13 +70,7 @@ class Window:
 
         self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
 
-        # Probably a cleaner way to have this functionality.
-        if not point_mass_list:
-            # generate range(N) random pointmasses
-            self.object_list = [generate_pointmass(
-                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(100)]
-        else:
-            self.object_list = point_mass_list
+        self.start_scenario()
 
     def draw_scale_bar(self) -> None:
         """_summary_
@@ -104,6 +98,25 @@ class Window:
         months_passed = round(12 * (years_passed % 1))
         self.SCALE_BAR_FONT.render_to(self.SCREEN, (
             x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{round(years_passed)} Years {months_passed} Month(s) Passed", (250, 250, 250))
+
+    def start_scenario(self):
+
+        self.scenario = 1
+
+        if self.scenario == 1:
+            Earth = self.planet_list[3]
+            Sun = self.planet_list[0]
+
+            self.object_list = [
+                PointMass([-30e3, 0], [2*AU, 3*AU], Earth.mass, Earth.colour),
+                PointMass([0, 0], [2*AU, 2*AU], Sun.mass, Sun.colour),
+                PointMass([+30e3, 0], [2*AU, 1*AU], Earth.mass, Earth.colour)
+            ]
+
+        elif self.scenario == 2:
+            # generate range(N) random pointmasses
+            self.object_list = [generate_pointmass(
+                (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(100)]
 
     def calculate_slingshot_velocity(self) -> tuple:
         # function name likely needs changing
@@ -233,7 +246,7 @@ class Window:
 
                     self.object_list.append(
                         PointMass([vx, vy], [au_x,
-                                             au_y], planet.mass, 7e9, colour=planet.colour)
+                                             au_y], planet.mass, radius=7e9, colour=planet.colour)
                     )
 
                     self.mouse_click_coordinate_pixels = [None, None]
@@ -352,14 +365,4 @@ if __name__ == '__main__':
     AU = 1.5e11
     screen_size = (800, 800)
 
-    # Two earths orbiting the sun test
-    point_list = [
-        PointMass([-30e3, 0], [2*AU, 3*AU], 6e28),
-        PointMass([0, 0], [2*AU, 2*AU], 2e30, colour=(255, 0, 0)),
-        PointMass([+30e3, 0], [2*AU, 1*AU], 6e24)
-    ]
-
-    #
-    # point_list = None
-
-    Window(screen_size, point_list).main_loop()
+    Window(screen_size, []).main_loop()
