@@ -36,7 +36,7 @@ class Window:
             Planet("Pluto", 0.0130e24, (204, 215, 222))
         ]
 
-        self.selected_planet = 2
+        self.selected_planet = 3
 
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
 
