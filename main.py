@@ -23,7 +23,7 @@ class Window:
         # Sufficiently small arbritrary number for first frame. Redefined in main loop.
         self.DELTA_T = 1/self.FPS
 
-        self.TIME_MULT = 1e6
+        self.time_mult = 1e6
 
         self.seconds_passed = 0
 
@@ -72,7 +72,7 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
-        self.seconds_passed += self.DELTA_T * self.TIME_MULT
+        self.seconds_passed += self.DELTA_T * self.time_mult
 
         years_passed = self.seconds_passed / (3600*24*365)
         months_passed = round(12 * (years_passed % 1))
@@ -154,6 +154,7 @@ class Window:
         #                  new_end_pos, arrow_component)
 
     def event_handler(self) -> bool:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
@@ -165,6 +166,14 @@ class Window:
                     self.mouse_click_coordinate_pixels = [
                         None, None]  # Cancel action
                     self.show_notification("Input Cancelled")
+
+                elif event.key == pygame.K_COMMA:
+                    self.time_mult /= 5
+                    self.show_notification(f"x{self.time_mult:.0f} Speed")
+
+                elif event.key == pygame.K_PERIOD:
+                    self.time_mult *= 5
+                    self.show_notification(f"x{self.time_mult:.0f} Speed")
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 left_mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -293,15 +302,15 @@ class Window:
             # Sums the velocities due to pull from each mass. Same as net forces.
             delta_v = (self.G * other_object.mass *
                        self.DELTA_T) / (separation**2)
-            delta_vx = delta_v * np.cos(angle) * self.TIME_MULT
-            delta_vy = delta_v * np.sin(angle) * self.TIME_MULT
+            delta_vx = delta_v * np.cos(angle) * self.time_mult
+            delta_vy = delta_v * np.sin(angle) * self.time_mult
 
             object.velocities += np.asarray([delta_vx,
                                             delta_vy], dtype=np.float64)
 
         # Updates positions with *Net* velocities, hence why outside the loop. Reduces number of calculations per frame.
         object.positions = object.positions + \
-            (object.velocities * self.DELTA_T * self.TIME_MULT)
+            (object.velocities * self.DELTA_T * self.time_mult)
 
 
 if __name__ == '__main__':
