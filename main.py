@@ -30,6 +30,8 @@ class Window:
 
         self.G = 6.67e-11  # gravitational constant
 
+        self.mouse_click_coordinate_pixels = [None, None]
+
         ONE_AU = 1.5e11
         PIXELS_PER_AU = 200
 
@@ -79,6 +81,14 @@ class Window:
                 if event.type == pygame.QUIT:
                     running = False
 
+                elif event.type == pygame.KEYDOWN:
+
+                    # If escape is pressed when lmb is held down
+                    if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
+                        self.mouse_click_coordinate_pixels = [
+                            None, None]  # Cancel action
+                        print("Input Cancelled.")
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     left_mouse_pressed = pygame.mouse.get_pressed()[0]
 
@@ -86,16 +96,22 @@ class Window:
 
                         mouse_x, mouse_y = pygame.mouse.get_pos()
 
+                        self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
+
                         au_x = mouse_x / self.AU_PIXELS_CONVERSION
                         au_y = (self.WINDOW_HEIGHT - mouse_y) / \
                             self.AU_PIXELS_CONVERSION
 
-                        print(mouse_y, au_y)
+                        # self.object_list.append(
+                        # PointMass([0, 0], [au_x,
+                        #   au_y], 1e26, 7e9)
+                        # )
 
-                        self.object_list.append(
-                            PointMass([0, 0], [au_x,
-                                      au_y], 1e26, 7e9)
-                        )
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    left_mouse_released = not pygame.mouse.get_pressed()[0]
+
+                    if left_mouse_released:
+                        print(self.mouse_click_coordinate_pixels)
 
             for object in self.object_list:
 
