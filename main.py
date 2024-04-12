@@ -30,6 +30,7 @@ class Window:
 
         self.G = 6.67e-11  # gravitational constant
 
+        self.slingshot_power = 1  # Multiplies the power the slingshot input has
         self.mouse_click_coordinate_pixels = [None, None]
 
         ONE_AU = 1.5e11
@@ -67,6 +68,51 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
+    def event_handler(self) -> bool:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+
+            elif event.type == pygame.KEYDOWN:
+
+                # If escape is pressed when lmb is held down
+                if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
+                    self.mouse_click_coordinate_pixels = [
+                        None, None]  # Cancel action
+                    print("Input Cancelled.")
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                left_mouse_pressed = pygame.mouse.get_pressed()[0]
+
+                if left_mouse_pressed:
+
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                    self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
+
+                    au_x = mouse_x / self.AU_PIXELS_CONVERSION
+                    au_y = (self.WINDOW_HEIGHT - mouse_y) / \
+                        self.AU_PIXELS_CONVERSION
+
+                    # self.object_list.append(
+                    # PointMass([0, 0], [au_x,
+                    #   au_y], 1e26, 7e9)
+                    # )
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                left_mouse_released = not pygame.mouse.get_pressed()[0]
+
+                if left_mouse_released:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    stored_x, stored_y = self.mouse_click_coordinate_pixels
+
+                    # Would only happen if user unclicked mouse button without clicking, or if user cancelled click.
+                    if stored_x is None or stored_y is None:
+                        break
+
+                    dy = stored_y - mouse_y
+                    dx = stored_x - mouse_x
+
     def main_loop(self) -> None:
         """_summary_
         """
@@ -77,41 +123,7 @@ class Window:
 
             self.draw_scale_bar()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                elif event.type == pygame.KEYDOWN:
-
-                    # If escape is pressed when lmb is held down
-                    if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
-                        self.mouse_click_coordinate_pixels = [
-                            None, None]  # Cancel action
-                        print("Input Cancelled.")
-
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    left_mouse_pressed = pygame.mouse.get_pressed()[0]
-
-                    if left_mouse_pressed:
-
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                        self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
-
-                        au_x = mouse_x / self.AU_PIXELS_CONVERSION
-                        au_y = (self.WINDOW_HEIGHT - mouse_y) / \
-                            self.AU_PIXELS_CONVERSION
-
-                        # self.object_list.append(
-                        # PointMass([0, 0], [au_x,
-                        #   au_y], 1e26, 7e9)
-                        # )
-
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    left_mouse_released = not pygame.mouse.get_pressed()[0]
-
-                    if left_mouse_released:
-                        print(self.mouse_click_coordinate_pixels)
+            running = self.event_handler()
 
             for object in self.object_list:
 
