@@ -68,6 +68,30 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
+    def calculate_slingshot_velocity(self) -> tuple:
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        stored_x, stored_y = self.mouse_click_coordinate_pixels
+
+        if None in self.mouse_click_coordinate_pixels:
+            return None
+
+        dy = stored_y - mouse_y
+        dx = stored_x - mouse_x
+
+        au_x = stored_x / self.AU_PIXELS_CONVERSION
+        au_y = (self.WINDOW_HEIGHT - stored_y) / \
+            self.AU_PIXELS_CONVERSION
+
+        coordinates_au = [au_x, au_y]
+
+        vx = dx * self.slingshot_power
+        vy = - dy * self.slingshot_power
+
+        velocities = [vx, vy]
+
+        return au_x, au_y, vx, vy
+
     def draw_arrow(self, start_pos, end_pos) -> None:
 
         new_end_pos = (2*start_pos - end_pos)
@@ -118,22 +142,13 @@ class Window:
                 left_mouse_released = not pygame.mouse.get_pressed()[0]
 
                 if left_mouse_released:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    stored_x, stored_y = self.mouse_click_coordinate_pixels
 
-                    # Would only happen if user unclicked mouse button without clicking, or if user cancelled click.
-                    if stored_x is None or stored_y is None:
+                    au_vel = self.calculate_slingshot_velocity()
+
+                    if au_vel is None:
                         break
 
-                    dy = stored_y - mouse_y
-                    dx = stored_x - mouse_x
-
-                    vx = dx * self.slingshot_power
-                    vy = - dy * self.slingshot_power
-
-                    au_x = stored_x / self.AU_PIXELS_CONVERSION
-                    au_y = (self.WINDOW_HEIGHT - stored_y) / \
-                        self.AU_PIXELS_CONVERSION
+                    au_x, au_y, vx, vy = au_vel
 
                     self.object_list.append(
                         PointMass([vx, vy], [au_x,
