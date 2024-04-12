@@ -6,7 +6,7 @@ class PointMass:
 
     number_of_point_masses = 0
 
-    def __init__(self, velocities: list, positions: list, mass: float, radius=7e9, colour=(255, 255, 255)) -> None:
+    def __init__(self, velocities: list, positions: list, mass: float, colour=(255, 255, 255), radius=7e9) -> None:
         """_summary_
 
         Args:
