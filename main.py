@@ -69,7 +69,28 @@ class Window:
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
     def draw_arrow(self, start_pos, end_pos) -> None:
-        pygame.draw(self.SCREEN, (255, 255, 255), start_pos, end_pos)
+
+        new_end_pos = (2*start_pos - end_pos)
+
+        pygame.draw.line(self.SCREEN, (255, 255, 255), start_pos, new_end_pos)
+
+        # ARROW_ANGLE = np.radians(-15)
+        # rotMatrix = np.array([[np.cos(ARROW_ANGLE), -np.sin(ARROW_ANGLE)],
+        #                       [np.sin(ARROW_ANGLE),  np.cos(ARROW_ANGLE)]])
+
+        # arrow_component = np.dot(new_end_pos, rotMatrix)
+
+        # pygame.draw.line(self.SCREEN, (255, 255, 255),
+        #                  new_end_pos, arrow_component)
+
+        # ARROW_ANGLE = np.radians(75)
+        # rotMatrix = np.array([[np.cos(ARROW_ANGLE), -np.sin(ARROW_ANGLE)],
+        #                       [np.sin(ARROW_ANGLE),  np.cos(ARROW_ANGLE)]])
+
+        # arrow_component = np.dot(new_end_pos, rotMatrix)
+
+        # pygame.draw.line(self.SCREEN, (255, 255, 255),
+        #                  new_end_pos, arrow_component)
 
     def event_handler(self) -> bool:
         for event in pygame.event.get():
@@ -121,6 +142,11 @@ class Window:
 
                     self.mouse_click_coordinate_pixels = [None, None]
 
+        if not None in self.mouse_click_coordinate_pixels:
+            print("Hello")
+            self.draw_arrow(np.array(self.mouse_click_coordinate_pixels), np.array(
+                pygame.mouse.get_pos()))
+
         return True
 
     def main_loop(self) -> None:
@@ -150,6 +176,7 @@ class Window:
                 pygame.draw.circle(
                     self.SCREEN, object.colour, flipped_y_position, object.radius*self.AU_PIXELS_CONVERSION)
 
+                # updates velocity and position based on gravitational attraction
                 self.update_object(object)
 
             # Could be a list comprehension / map
