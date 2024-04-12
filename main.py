@@ -27,13 +27,11 @@ class Window:
 
         self.seconds_passed = 0
 
-        # self.TIME_MULT = 3e6
-
         self.COLLISION_ON = True
 
         self.G = 6.67e-11  # gravitational constant
 
-        self.slingshot_power = 1e3  # Multiplies the power the slingshot input has
+        self.slingshot_power = 2e2  # Multiplies the power the slingshot input has
         self.mouse_click_coordinate_pixels = [None, None]
 
         ONE_AU = 1.5e11
@@ -73,10 +71,10 @@ class Window:
 
         self.seconds_passed += self.DELTA_T * self.TIME_MULT
 
-        years_passed = round(self.seconds_passed / (3600*24*365), 2)
-
+        years_passed = self.seconds_passed / (3600*24*365)
+        months_passed = round(12 * (years_passed % 1))
         self.SCALE_BAR_FONT.render_to(self.SCREEN, (
-            x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{years_passed} Years Passed", (250, 250, 250))
+            x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{round(years_passed)} Years {months_passed} Month(s) Passed", (250, 250, 250))
 
     def calculate_slingshot_velocity(self) -> tuple:
 
@@ -175,7 +173,6 @@ class Window:
                     self.mouse_click_coordinate_pixels = [None, None]
 
         if not None in self.mouse_click_coordinate_pixels:
-            print("Hello")
             self.draw_arrow(np.array(self.mouse_click_coordinate_pixels), np.array(
                 pygame.mouse.get_pos()))
 
