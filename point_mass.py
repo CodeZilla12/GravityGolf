@@ -72,6 +72,8 @@ def points_colliding(point_a: PointMass, point_b: PointMass) -> bool:
         bool: _description_
     """
 
+    # change this to be inside pointmass class
+
     return (point_a.radius - point_b.radius)**2 <= np.sum(np.square(point_a.positions - point_b.positions)) <= (point_a.radius + point_b.radius)**2
 
     # (R0 - R1)**2 <= (x0 - x1)^2 + (y0 - y1)^2 <= (R0 + R1)^2
