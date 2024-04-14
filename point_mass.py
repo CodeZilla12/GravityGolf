@@ -6,7 +6,7 @@ class PointMass:
 
     number_of_point_masses = 0
 
-    def __init__(self, velocities: list, positions: list, mass: float, colour=(255, 255, 255), radius=7e9) -> None:
+    def __init__(self, velocities: list, positions: list, mass: float, colour=(255, 255, 255), radius=7e9, is_target=False, player_spawned=False) -> None:
         """_summary_
 
         Args:
@@ -20,6 +20,8 @@ class PointMass:
         PointMass.number_of_point_masses += 1
 
         self.is_deleted = False
+        self.is_target = is_target
+        self.player_spawned = player_spawned
 
         self.velocities = np.asarray(velocities, dtype=np.float64)
         self.positions = np.asarray(positions, dtype=np.float64)
