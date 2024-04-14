@@ -58,3 +58,5 @@ This next demo is of random point-masses at random locations, showing off the ti
 * Sprucing up the visuals
 * Creating more scenarios
 * Resizable window
+* Multithreading for calculations
+  
