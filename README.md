@@ -3,7 +3,10 @@ A WIP pygame-based gravity-simulation golf game.
 
 # Background
 
-We start with Newton's Law of Gravitation, and set it equal to Netwon's second law
+The simulation running is based on Newton's gravitation equation. It is an approximation that works fine for masses separated by sufficient diameter, and does not take into account relativistic effects.
+These limitations are not very important for a toy simulation, but the important thing to bear in mind is that it will not take into account surface-to-surface separation of point masses.
+
+Nonetheless, the radii of the planets in this simulation are greatly exaggerated, otherwise they would not show up on the screen even as a single pixel.
 
 $F = \frac{GMm}{r^2} = ma = m\frac{{\Delta}v}{t}$
 
@@ -21,7 +24,7 @@ By summing all of the ${\Delta}v$ terms for each mass $M$, we can get the net ve
 
 $d=v{\cdot}t$
 
-The smaller the time-step, the more accurate the simulations. However, a scaling factor of ~3e6x speed was used as a real-time gravity simulation is not very entertaining. 
+The smaller the time-step, the more accurate the simulations. However, a default time multiplication factor of 3e6x speed was used as a real-time gravity simulation is not very entertaining. This produces acceptable accuracy while making the program feel somewhat responsive.
 
 # Gif Demos
 
