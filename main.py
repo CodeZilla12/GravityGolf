@@ -37,6 +37,7 @@ class Window:
         ]
 
         self.selected_planet = 3
+        self.number_of_shots_taken = 0
 
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
         pygame.init()
@@ -52,7 +53,11 @@ class Window:
 
         self.COLLISION_ON = True
 
+        # Remains constant until final scenario, multiplicative.
+        self.NOTIFICATION_FADEOUT = 0.98
+
         self.notification_opacity = 1
+
         self.notification_text = ""
 
         self.G = 6.67e-11  # gravitational constant
@@ -65,8 +70,16 @@ class Window:
 
         self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
 
-        self.SCALE_BAR_FONT = pygame.freetype.Font('COMIC.ttf', 30)
+        self.TEXT_FONT = pygame.freetype.Font('COMIC.ttf', 30)
 
+        # Max velocity reached in a scenario. Incentivises gravity slingshot.
+        self.max_velocity = 0
+
+        # scales off of number of shots taken and max_velocity.
+        self.final_score = 0
+
+        self.scenario_won = False
+        self.scenario = 1  # default scenario
         self.start_scenario()
 
     def draw_scale_bar(self) -> None:
@@ -86,19 +99,27 @@ class Window:
                          y-half_arm_width), (x1, self.WINDOW_HEIGHT-y+half_arm_width))
         pygame.draw.line(self.SCREEN, (255, 255, 255), (x2, self.WINDOW_HEIGHT -
                          y-half_arm_width), (x2, self.WINDOW_HEIGHT-y+half_arm_width))
-        self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
+        self.TEXT_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
         self.seconds_passed += self.delta_t * self.time_mult
 
         years_passed = self.seconds_passed / (3600*24*365)
         months_passed = round(12 * (years_passed % 1))
-        self.SCALE_BAR_FONT.render_to(self.SCREEN, (
+        self.TEXT_FONT.render_to(self.SCREEN, (
             x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{round(years_passed)} Years {months_passed} Month(s) Passed", (250, 250, 250))
+        self.TEXT_FONT.render_to(self.SCREEN, (
+            x2+50, self.WINDOW_HEIGHT-4*half_arm_width), f"{self.number_of_shots_taken} Shots Taken", (250, 250, 250))
 
     def start_scenario(self):
 
-        self.scenario = 1
+        self.object_list = []  # Refresh object list
+
+        if self.number_of_shots_taken > 0:
+            self.final_score += self.max_velocity // self.number_of_shots_taken
+
+        self.number_of_shots_taken = 0
+        self.max_velocity = 0
 
         if self.scenario == 1:
             Earth = self.planet_list[3]
@@ -106,7 +127,8 @@ class Window:
 
             self.object_list = [
                 PointMass([-30e3, 0], [2*AU, 3*AU], Earth.mass, Earth.colour),
-                PointMass([0, 0], [2*AU, 2*AU], Sun.mass, Sun.colour),
+                PointMass([0, 0], [2*AU, 2*AU], Sun.mass,
+                          Sun.colour, is_target=True),
                 PointMass([+30e3, 0], [2*AU, 1*AU], Earth.mass, Earth.colour)
             ]
 
@@ -115,8 +137,12 @@ class Window:
             self.object_list = [generate_pointmass(
                 (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(100)]
 
+            self.NOTIFICATION_FADEOUT = 1
+            self.show_notification(f"You Won! Final Score: {self.final_score}")
+
     def calculate_slingshot_velocity(self) -> tuple:
         # function name likely needs changing
+        # refers to the slingshot motion of spawning new planets
         mouse_x, mouse_y = pygame.mouse.get_pos()
         stored_x, stored_y = self.mouse_click_coordinate_pixels
 
@@ -152,11 +178,10 @@ class Window:
             self.notification_opacity = 1
             self.notification_text = ""
 
-        self.SCALE_BAR_FONT.render_to(
+        self.TEXT_FONT.render_to(
             self.SCREEN, (x, y), self.notification_text, color)
 
-        NOTIFICATION_FADEOUT = 0.98
-        self.notification_opacity *= NOTIFICATION_FADEOUT
+        self.notification_opacity *= self.NOTIFICATION_FADEOUT
 
     def draw_arrow(self, start_pos, end_pos) -> None:
 
@@ -168,7 +193,7 @@ class Window:
 
         velocity = f"{round(np.hypot(vx, vy)*1e-3)}Km/s"
 
-        self.SCALE_BAR_FONT.render_to(
+        self.TEXT_FONT.render_to(
             self.SCREEN, new_end_pos + 10, str(velocity), (250, 250, 250))
 
         # ARROW_ANGLE = np.radians(-15)
@@ -243,10 +268,11 @@ class Window:
 
                     self.object_list.append(
                         PointMass([vx, vy], [au_x,
-                                             au_y], planet.mass, radius=7e9, colour=planet.colour)
+                                             au_y], planet.mass, radius=7e9, colour=planet.colour, player_spawned=True)
                     )
 
                     self.mouse_click_coordinate_pixels = [None, None]
+                    self.number_of_shots_taken += 1
 
         if not None in self.mouse_click_coordinate_pixels:
             self.draw_arrow(np.array(self.mouse_click_coordinate_pixels), np.array(
@@ -291,6 +317,11 @@ class Window:
 
             self.show_notification()
 
+            if self.scenario_won:
+                self.scenario_won = False
+                self.scenario += 1
+                self.start_scenario()
+
             pygame.display.flip()  # update drawing canvas
 
             self.delta_t = self.CLOCK.tick(self.FPS) * 1e-3
@@ -333,6 +364,9 @@ class Window:
                     # Smaller object scaled by 1/4 to more accurately model absorption and to limit exponential growth
                     larger_object.radius = larger_object.radius + smaller_object.radius//4
 
+                    if larger_object.is_target is True or smaller_object.is_target is True:
+                        self.scenario_won = True
+
                     # Returns here to avoid unintended behaviour from deleting object. May cause time inaccuracies if low fps or many collisions
                     return
 
@@ -346,6 +380,10 @@ class Window:
             # Sums the velocities due to pull from each mass. Same as net forces.
             delta_v = (self.G * other_object.mass *
                        self.delta_t) / (separation**2)
+
+            if delta_v > self.max_velocity:
+                self.max_velocity = delta_v
+
             delta_vx = delta_v * np.cos(angle) * self.time_mult
             delta_vy = delta_v * np.sin(angle) * self.time_mult
 
