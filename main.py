@@ -223,72 +223,78 @@ class Window:
         # pygame.draw.line(self.SCREEN, (255, 255, 255),
         #                  new_end_pos, arrow_component)
 
+    def mouse_event_handler(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            left_mouse_pressed = pygame.mouse.get_pressed()[0]
+
+            if left_mouse_pressed:
+
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            left_mouse_released = not pygame.mouse.get_pressed()[0]
+
+            if left_mouse_released:
+
+                au_vel = self.calculate_slingshot_velocity()
+
+                # if no stored coordinates
+                if au_vel is None:
+                    return
+
+                au_x, au_y, vx, vy = au_vel
+
+                planet = self.planet_list[self.selected_planet]
+
+                self.object_list.append(
+                    PointMass([vx, vy], [au_x,
+                                         au_y], planet.mass, radius=7e9, colour=planet.colour, player_spawned=True)
+                )
+
+                self.mouse_click_coordinate_pixels = [None, None]
+                self.number_of_shots_taken += 1
+
+    def keyboard_event_handler(self, event):
+        if event.type == pygame.KEYDOWN:
+
+            # If escape is pressed when lmb is held down
+            if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
+                self.mouse_click_coordinate_pixels = [
+                    None, None]  # Cancel action
+                self.show_notification("Input Cancelled")
+
+            elif event.key == pygame.K_COMMA:
+                self.time_mult /= 5
+                self.show_notification(f"x{self.time_mult:.0f} Speed")
+
+            elif event.key == pygame.K_PERIOD:
+                self.time_mult *= 5
+                self.show_notification(f"x{self.time_mult:.0f} Speed")
+
+            elif event.unicode.isdigit():
+                self.selected_planet = int(event.unicode)
+                planet = self.planet_list[self.selected_planet]
+                self.show_notification(
+                    f"{planet.name}: {planet.mass:.0e}Kg")
+
+            elif event.key == pygame.K_r:
+                # restart_scenario
+                self.max_velocity = 0
+                self.number_of_shots_taken = 0
+                self.scenario = 1
+                self.start_scenario()
+
     def event_handler(self) -> bool:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
 
-            elif event.type == pygame.KEYDOWN:
+            self.mouse_event_handler(event)
 
-                # If escape is pressed when lmb is held down
-                if event.key == pygame.K_ESCAPE and pygame.mouse.get_pressed()[0] == True:
-                    self.mouse_click_coordinate_pixels = [
-                        None, None]  # Cancel action
-                    self.show_notification("Input Cancelled")
-
-                elif event.key == pygame.K_COMMA:
-                    self.time_mult /= 5
-                    self.show_notification(f"x{self.time_mult:.0f} Speed")
-
-                elif event.key == pygame.K_PERIOD:
-                    self.time_mult *= 5
-                    self.show_notification(f"x{self.time_mult:.0f} Speed")
-
-                elif event.unicode.isdigit():
-                    self.selected_planet = int(event.unicode)
-                    planet = self.planet_list[self.selected_planet]
-                    self.show_notification(
-                        f"{planet.name}: {planet.mass:.0e}Kg")
-
-                elif event.key == pygame.K_r:
-                    # restart_scenario
-                    self.max_velocity = 0
-                    self.number_of_shots_taken = 0
-                    self.scenario = 1
-                    self.start_scenario()
-
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                left_mouse_pressed = pygame.mouse.get_pressed()[0]
-
-                if left_mouse_pressed:
-
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                    self.mouse_click_coordinate_pixels = [mouse_x, mouse_y]
-
-            elif event.type == pygame.MOUSEBUTTONUP:
-                left_mouse_released = not pygame.mouse.get_pressed()[0]
-
-                if left_mouse_released:
-
-                    au_vel = self.calculate_slingshot_velocity()
-
-                    # if no stored coordinates
-                    if au_vel is None:
-                        break
-
-                    au_x, au_y, vx, vy = au_vel
-
-                    planet = self.planet_list[self.selected_planet]
-
-                    self.object_list.append(
-                        PointMass([vx, vy], [au_x,
-                                             au_y], planet.mass, radius=7e9, colour=planet.colour, player_spawned=True)
-                    )
-
-                    self.mouse_click_coordinate_pixels = [None, None]
-                    self.number_of_shots_taken += 1
+            self.keyboard_event_handler(event)
 
         if not None in self.mouse_click_coordinate_pixels:
             self.draw_arrow(np.array(self.mouse_click_coordinate_pixels), np.array(
