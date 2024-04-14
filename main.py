@@ -116,7 +116,8 @@ class Window:
         self.object_list = []  # Refresh object list
 
         if self.number_of_shots_taken > 0:
-            self.final_score += self.max_velocity // self.number_of_shots_taken
+            self.final_score += (self.max_velocity *
+                                 1e3) // self.number_of_shots_taken
 
         self.number_of_shots_taken = 0
         self.max_velocity = 0
@@ -138,7 +139,8 @@ class Window:
                 (0, self.WINDOW_WIDTH/self.AU_PIXELS_CONVERSION), (0, self.WINDOW_HEIGHT/self.AU_PIXELS_CONVERSION)) for _ in range(100)]
 
             self.NOTIFICATION_FADEOUT = 1
-            self.show_notification(f"You Won! Final Score: {self.final_score}")
+            self.show_notification(
+                f"You Won! Final Score: {round(self.final_score)}")
 
     def calculate_slingshot_velocity(self) -> tuple:
         # function name likely needs changing
@@ -241,6 +243,12 @@ class Window:
                     planet = self.planet_list[self.selected_planet]
                     self.show_notification(
                         f"{planet.name}: {planet.mass:.0e}Kg")
+
+                elif event.key == pygame.K_r:
+                    # restart_scenario
+                    self.max_velocity = 0
+                    self.number_of_shots_taken = 0
+                    self.start_scenario()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 left_mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -364,7 +372,10 @@ class Window:
                     # Smaller object scaled by 1/4 to more accurately model absorption and to limit exponential growth
                     larger_object.radius = larger_object.radius + smaller_object.radius//4
 
-                    if larger_object.is_target is True or smaller_object.is_target is True:
+                    # If player-spawned object collided with target
+                    target_collision = larger_object.is_target is True or smaller_object.is_target is True
+                    player_collided = larger_object.player_spawned or smaller_object.player_spawned
+                    if target_collision and player_collided:
                         self.scenario_won = True
 
                     # Returns here to avoid unintended behaviour from deleting object. May cause time inaccuracies if low fps or many collisions
@@ -381,7 +392,7 @@ class Window:
             delta_v = (self.G * other_object.mass *
                        self.delta_t) / (separation**2)
 
-            if delta_v > self.max_velocity:
+            if delta_v > self.max_velocity and True in (object.player_spawned, other_object.player_spawned):
                 self.max_velocity = delta_v
 
             delta_vx = delta_v * np.cos(angle) * self.time_mult
@@ -398,6 +409,7 @@ class Window:
 if __name__ == '__main__':
 
     AU = 1.5e11
-    screen_size = (800, 800)
 
+    # UI will likely malfunction with increasing screen_size for now.
+    screen_size = (800, 800)
     Window(screen_size, []).main_loop()
