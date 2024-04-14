@@ -20,3 +20,10 @@ ${\Delta}v$ is the change in velocity of a $m$ due to an external mass $M$
 By summing all of the ${\Delta}v$ terms for each mass $M$, we can get the net velocity (as above). From which, we can get the distance travelled by the pointmass $m$ in a timestep $t$
 
 $d=v{\cdot}t$
+
+#Gif Demos
+Note: The gifs are recorded at a very low framerate. The program maintains a steady 60fps at these object numbers.
+
+![alt text](Demo.gif)
+
+![alt text](Demo2.gif)
