@@ -79,7 +79,7 @@ class Window:
 
         # scales off of number of shots taken and max_velocity.
         self.final_score = 0
-        self.sandbox_mode = True  # If true, the game cannot progress past scenario one
+        self.sandbox_mode = False  # If true, the game cannot progress past scenario one
         self.scenario_won = False
         self.scenario = 1  # default scenario
         self.start_scenario()
