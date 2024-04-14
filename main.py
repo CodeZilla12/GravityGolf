@@ -348,6 +348,8 @@ class Window:
         """_summary_
         """
 
+        # Very ugly. Needs fixing.
+
         x1 = 50
         x2 = x1 + (self.AU * self.AU_PIXELS_CONVERSION)
 
