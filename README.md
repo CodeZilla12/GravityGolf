@@ -24,6 +24,8 @@ $d=v{\cdot}t$
 #Gif Demos
 Note: The gifs are recorded at a very low framerate. The program maintains a steady 60fps at these object numbers.
 
-![alt text](Demo.gif)
+![Sandbox Gif](Demo.gif)
 
-![alt text](Demo2.gif)
+![Binary Earth Orbit](Demo2.gif)
+
+![Randomly Generated Point w/ Time Scale Change](Demo3.gif)
