@@ -22,7 +22,7 @@ class Window:
         """
 
         # Dictionary of all planets and their masses(kg) and colours(rgb)
-
+        # https://nssdc.gsfc.nasa.gov/planetary/factsheet/
         self.planet_list = [
             Planet("Sun", 2e30, (255, 100, 0)),
             Planet("Mercury", 0.330e24, (255, 50, 50)),
@@ -39,7 +39,6 @@ class Window:
         self.selected_planet = 3
 
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
-
         pygame.init()
         self.SCREEN = pygame.display.set_mode(
             [self.WINDOW_WIDTH, self.WINDOW_HEIGHT])
@@ -47,10 +46,8 @@ class Window:
         self.FPS = 60
 
         # Sufficiently small arbritrary number for first frame. Redefined in main loop.
-        self.DELTA_T = 1/self.FPS
-
+        self.delta_t = 1/self.FPS
         self.time_mult = 1e6
-
         self.seconds_passed = 0
 
         self.COLLISION_ON = True
@@ -92,7 +89,7 @@ class Window:
         self.SCALE_BAR_FONT.render_to(self.SCREEN, ((
             x2-x1)/2, self.WINDOW_HEIGHT-y-half_arm_width), '1 AU', (250, 250, 250))
 
-        self.seconds_passed += self.DELTA_T * self.time_mult
+        self.seconds_passed += self.delta_t * self.time_mult
 
         years_passed = self.seconds_passed / (3600*24*365)
         months_passed = round(12 * (years_passed % 1))
@@ -216,9 +213,9 @@ class Window:
 
                 elif event.unicode.isdigit():
                     self.selected_planet = int(event.unicode)
-                    print(event.key)
+                    planet = self.planet_list[self.selected_planet]
                     self.show_notification(
-                        self.planet_list[self.selected_planet].name)
+                        f"{planet.name}: {planet.mass:.0e}Kg")
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 left_mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -296,7 +293,7 @@ class Window:
 
             pygame.display.flip()  # update drawing canvas
 
-            self.DELTA_T = self.CLOCK.tick(self.FPS) * 1e-3
+            self.delta_t = self.CLOCK.tick(self.FPS) * 1e-3
 
     def update_object(self, object: PointMass) -> None:
         """_summary_
@@ -348,7 +345,7 @@ class Window:
 
             # Sums the velocities due to pull from each mass. Same as net forces.
             delta_v = (self.G * other_object.mass *
-                       self.DELTA_T) / (separation**2)
+                       self.delta_t) / (separation**2)
             delta_vx = delta_v * np.cos(angle) * self.time_mult
             delta_vy = delta_v * np.sin(angle) * self.time_mult
 
@@ -357,7 +354,7 @@ class Window:
 
         # Updates positions with *Net* velocities, hence why outside the loop. Reduces number of calculations per frame.
         object.positions = object.positions + \
-            (object.velocities * self.DELTA_T * self.time_mult)
+            (object.velocities * self.delta_t * self.time_mult)
 
 
 if __name__ == '__main__':
