@@ -61,14 +61,13 @@ class Window:
         self.notification_text = ""
 
         self.G = 6.67e-11  # gravitational constant
+        self.AU = 1.5e11  # one astronomical unit in metres
+        PIXELS_PER_AU = 200
 
         self.slingshot_power = 2e2  # Multiplies the power the slingshot input has
         self.mouse_click_coordinate_pixels = [None, None]
 
-        ONE_AU = 1.5e11
-        PIXELS_PER_AU = 200
-
-        self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / ONE_AU
+        self.AU_PIXELS_CONVERSION = PIXELS_PER_AU / self.AU
 
         self.TEXT_FONT = pygame.freetype.Font('COMIC.ttf', 30)
 
@@ -88,9 +87,8 @@ class Window:
         """_summary_
         """
 
-        ONE_AU = 1.5e11
         x1 = 50
-        x2 = x1 + (ONE_AU * self.AU_PIXELS_CONVERSION)
+        x2 = x1 + (self.AU * self.AU_PIXELS_CONVERSION)
 
         y = 50
         half_arm_width = 25
@@ -141,10 +139,12 @@ class Window:
             Sun = self.planet_list[0]
 
             self.object_list = [
-                PointMass([-30e3, 0], [2*AU, 3*AU], Earth.mass, Earth.colour),
-                PointMass([0, 0], [2*AU, 2*AU], Sun.mass,
+                PointMass([-30e3, 0], [2*self.AU, 3*self.AU],
+                          Earth.mass, Earth.colour),
+                PointMass([0, 0], [2*self.AU, 2*self.AU], Sun.mass,
                           Sun.colour, is_target=True),
-                PointMass([+30e3, 0], [2*AU, 1*AU], Earth.mass, Earth.colour)
+                PointMass([+30e3, 0], [2*self.AU, 1*self.AU],
+                          Earth.mass, Earth.colour)
             ]
 
         elif self.scenario == 2:
@@ -424,8 +424,6 @@ class Window:
 
 
 if __name__ == '__main__':
-
-    AU = 1.5e11
 
     # UI will likely malfunction with increasing screen_size for now.
     screen_size = (800, 800)
