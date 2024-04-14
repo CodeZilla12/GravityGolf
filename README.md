@@ -11,5 +11,7 @@ Where $F$ is gravitational force, $G$ is the gravitational constant, $M$ and $m$
 
 This can be rearranged as:
 
-${\Delta}v = \frac{GMt}{r^2}
+${\Delta}v = \frac{GMt}{r^2}$
+
+${\Delta}v$ is the change in velocity of a $m$ due to an external mass $M$
 
