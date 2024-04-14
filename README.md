@@ -15,3 +15,8 @@ ${\Delta}v = \frac{GMt}{r^2}$
 
 ${\Delta}v$ is the change in velocity of a $m$ due to an external mass $M$
 
+![alt text](VelocityDiagram.png)
+
+By summing all of the ${\Delta}v$ terms for each mass $M$, we can get the net velocity (as above). From which, we can get the distance travelled by the pointmass $m$ in a timestep $t$
+
+$d=v{\cdot}t$
