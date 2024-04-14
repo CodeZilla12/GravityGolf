@@ -2,14 +2,7 @@ import pygame
 import numpy as np
 import random
 from point_mass import PointMass, generate_pointmass, points_colliding
-
-
-class Planet:
-    def __init__(self, name, mass, colour):
-        # could be a dataclass instead
-        self.name = name
-        self.mass = mass
-        self.colour = colour
+from planet import Planet
 
 
 class Window:
@@ -36,7 +29,7 @@ class Window:
             Planet("Pluto", 0.0130e24, (204, 215, 222))
         ]
 
-        self.selected_planet = 3
+        self.selected_planet = 1
         self.number_of_shots_taken = 0
 
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = screen_size
