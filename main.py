@@ -262,7 +262,9 @@ class Window:
                     f"{planet.name}: {planet.mass:.0e}Kg")
 
             elif event.key == pygame.K_r:
-                # restart_scenario
+                # restart game
+                self.seconds_passed = 0
+                self.notification_opacity = 0.98
                 self.max_velocity = 0
                 self.number_of_shots_taken = 0
                 self.scenario = 1
