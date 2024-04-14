@@ -205,24 +205,6 @@ class Window:
         self.TEXT_FONT.render_to(
             self.SCREEN, new_end_pos + 10, str(velocity), (250, 250, 250))
 
-        # ARROW_ANGLE = np.radians(-15)
-        # rotMatrix = np.array([[np.cos(ARROW_ANGLE), -np.sin(ARROW_ANGLE)],
-        #                       [np.sin(ARROW_ANGLE),  np.cos(ARROW_ANGLE)]])
-
-        # arrow_component = np.dot(new_end_pos, rotMatrix)
-
-        # pygame.draw.line(self.SCREEN, (255, 255, 255),
-        #                  new_end_pos, arrow_component)
-
-        # ARROW_ANGLE = np.radians(75)
-        # rotMatrix = np.array([[np.cos(ARROW_ANGLE), -np.sin(ARROW_ANGLE)],
-        #                       [np.sin(ARROW_ANGLE),  np.cos(ARROW_ANGLE)]])
-
-        # arrow_component = np.dot(new_end_pos, rotMatrix)
-
-        # pygame.draw.line(self.SCREEN, (255, 255, 255),
-        #                  new_end_pos, arrow_component)
-
     def mouse_event_handler(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             left_mouse_pressed = pygame.mouse.get_pressed()[0]
