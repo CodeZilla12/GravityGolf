@@ -72,12 +72,14 @@ class Window:
 
         self.TEXT_FONT = pygame.freetype.Font('COMIC.ttf', 30)
 
+        self.object_list = []
+
         # Max velocity reached in a scenario. Incentivises gravity slingshot.
         self.max_velocity = 0
 
         # scales off of number of shots taken and max_velocity.
         self.final_score = 0
-
+        self.sandbox_mode = True  # If true, the game cannot progress past scenario one
         self.scenario_won = False
         self.scenario = 1  # default scenario
         self.start_scenario()
@@ -105,13 +107,21 @@ class Window:
         self.seconds_passed += self.delta_t * self.time_mult
 
         years_passed = self.seconds_passed / (3600*24*365)
-        months_passed = round(12 * (years_passed % 1))
+
+        months_passed = 12 * (years_passed % 1)
+
+        years_passed = self.seconds_passed / (3600*24*365)
+
         self.TEXT_FONT.render_to(self.SCREEN, (
-            x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{round(years_passed)} Years {months_passed} Month(s) Passed", (250, 250, 250))
+            x2+50, self.WINDOW_HEIGHT-2*half_arm_width), f"{np.floor(years_passed)} Years {np.floor(months_passed)} Month(s) Passed", (250, 250, 250))
         self.TEXT_FONT.render_to(self.SCREEN, (
             x2+50, self.WINDOW_HEIGHT-4*half_arm_width), f"{self.number_of_shots_taken} Shots Taken", (250, 250, 250))
 
     def start_scenario(self):
+
+        if self.sandbox_mode:
+            self.show_notification("Sandbox mode Active")
+            return
 
         self.object_list = []  # Refresh object list
 
@@ -123,6 +133,10 @@ class Window:
         self.max_velocity = 0
 
         if self.scenario == 1:
+
+            self.show_notification(
+                "Binary Earths Orbiting the Sun. Target: The Sun")
+
             Earth = self.planet_list[3]
             Sun = self.planet_list[0]
 
@@ -140,7 +154,7 @@ class Window:
 
             self.NOTIFICATION_FADEOUT = 1
             self.show_notification(
-                f"You Won! Final Score: {round(self.final_score)}")
+                f"You Won! Final Score: {round(self.final_score)}. Press R to Restart")
 
     def calculate_slingshot_velocity(self) -> tuple:
         # function name likely needs changing
@@ -248,6 +262,7 @@ class Window:
                     # restart_scenario
                     self.max_velocity = 0
                     self.number_of_shots_taken = 0
+                    self.scenario = 1
                     self.start_scenario()
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -353,6 +368,8 @@ class Window:
             if self.COLLISION_ON:
                 if points_colliding(object, other_object):
 
+                    # Bug where if two objects are the same size, they both disappear
+
                     larger_object = (object, other_object)[
                         np.argmax((object.mass, other_object.mass))]
 
@@ -379,7 +396,7 @@ class Window:
                         self.scenario_won = True
 
                     # Returns here to avoid unintended behaviour from deleting object. May cause time inaccuracies if low fps or many collisions
-                    return
+                    # return
 
             dx, dy = other_object.positions - object.positions
 
