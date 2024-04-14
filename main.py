@@ -348,6 +348,34 @@ class Window:
 
             self.delta_t = self.CLOCK.tick(self.FPS) * 1e-3
 
+    def update_object_collision(self, object1, object2):
+        # Bug where if two objects are the same size, they both disappear
+
+        larger_object = (object1, object2)[
+            np.argmax((object1.mass, object2.mass))]
+
+        smaller_object = (object1, object2)[
+            np.argmin((object1.mass, object2.mass))]
+
+        smaller_object.is_deleted = True
+
+        combined_mass = object1.mass + object2.mass
+
+        # Inelastic collision / conservation of momentum
+        larger_object.velocities = (
+            object1.mass*object1.velocities + object2.mass*object2.velocities) / combined_mass
+
+        larger_object.mass = combined_mass
+
+        # Smaller object scaled by 1/4 to more accurately model absorption and to limit exponential growth
+        larger_object.radius = larger_object.radius + smaller_object.radius//4
+
+        # If player-spawned object collided with target
+        target_collision = larger_object.is_target is True or smaller_object.is_target is True
+        player_collided = larger_object.player_spawned or smaller_object.player_spawned
+        if target_collision and player_collided:
+            self.scenario_won = True
+
     def update_object(self, object: PointMass) -> None:
         """_summary_
 
@@ -367,35 +395,11 @@ class Window:
             if self.COLLISION_ON:
                 if points_colliding(object, other_object):
 
-                    # Bug where if two objects are the same size, they both disappear
-
-                    larger_object = (object, other_object)[
-                        np.argmax((object.mass, other_object.mass))]
-
-                    smaller_object = (object, other_object)[
-                        np.argmin((object.mass, other_object.mass))]
-
-                    smaller_object.is_deleted = True
-
-                    combined_mass = object.mass + other_object.mass
-
-                    # Inelastic collision / conservation of momentum
-                    larger_object.velocities = (
-                        object.mass*object.velocities + other_object.mass*other_object.velocities) / combined_mass
-
-                    larger_object.mass = combined_mass
-
-                    # Smaller object scaled by 1/4 to more accurately model absorption and to limit exponential growth
-                    larger_object.radius = larger_object.radius + smaller_object.radius//4
-
-                    # If player-spawned object collided with target
-                    target_collision = larger_object.is_target is True or smaller_object.is_target is True
-                    player_collided = larger_object.player_spawned or smaller_object.player_spawned
-                    if target_collision and player_collided:
-                        self.scenario_won = True
+                    # handles object collision logic
+                    self.update_object_collision(object, other_object)
 
                     # Returns here to avoid unintended behaviour from deleting object. May cause time inaccuracies if low fps or many collisions
-                    # return
+                    return
 
             dx, dy = other_object.positions - object.positions
 
