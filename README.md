@@ -6,6 +6,12 @@ At the current moment of writing this, the simulation is mostly accurate, and mo
 
 You can select multiple planets with the numeric keys (0-9) which correspond to the planets (and the Sun) in the solar system, with accurate masses, and their velocity can be set by clicking and dragging in a slingshot motion. For context, the Earth's current speed is ~30Km/s, and orbits can be accurately created with player placed planets (Note: shots can be cancelled with the esc key).
 
+# Requirements
+
+Python 3.10.12<= 
+Pygame 2.5.1<=
+Numpy 1.21.3<=
+
 # Background
 
 The simulation running is based on Newton's gravitation equation. It is an approximation that works fine for masses separated by sufficient diameter, and does not take into account relativistic effects.
