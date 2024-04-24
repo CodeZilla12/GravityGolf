@@ -9,8 +9,11 @@ You can select multiple planets with the numeric keys (0-9) which correspond to 
 # Requirements
 
 Python 3.10.12<= 
+
 Pygame 2.5.1<=
+
 Numpy 1.21.3<=
+
 
 # Background
 
