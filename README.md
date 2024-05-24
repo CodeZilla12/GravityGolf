@@ -44,7 +44,7 @@ The smaller the time-step, the more accurate the simulations. However, a default
 
 # Gif Demos
 
-Note: The gifs are recorded at a very low framerate. The program maintains a steady 60fps at these object numbers.
+Note: The gifs are recorded at a very low framerate due to hardware limitations. The program maintains a steady 60fps at these object numbers.
 
 This demo is of the "Sandbox mode" - placing the planets manually
 ![Sandbox Gif](Demo.gif)
